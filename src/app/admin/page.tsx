@@ -214,50 +214,7 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* System Health & Infrastructure Diagnostics Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 p-4 rounded-xl bg-slate-900 text-white shadow-md">
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-emerald-500/20 text-emerald-400">
-              <Activity className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-[11px] text-slate-400 font-semibold">Database Status</div>
-              <div className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" /> Online (38ms)
-              </div>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-blue-500/20 text-blue-400">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-[11px] text-slate-400 font-semibold">Security & SSL</div>
-              <div className="text-xs font-bold text-slate-200">256-Bit Encrypted</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-purple-500/20 text-purple-400">
-              <HardDrive className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-[11px] text-slate-400 font-semibold">Cloud Storage</div>
-              <div className="text-xs font-bold text-slate-200">24.8 GB / 100 GB</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-amber-500/20 text-amber-400">
-              <Clock className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="text-[11px] text-slate-400 font-semibold">Automated Backup</div>
-              <div className="text-xs font-bold text-slate-200">2 hrs ago (Verified)</div>
-            </div>
-          </div>
-        </div>
 
         {/* Primary Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
