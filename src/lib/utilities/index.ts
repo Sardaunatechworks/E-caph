@@ -1,7 +1,6 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import slugifyLib from 'slugify';
-import DOMPurify from 'isomorphic-dompurify';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -15,8 +14,10 @@ export function slugify(text: string): string {
   });
 }
 
-export function sanitizeHtml(html: string): string {
+export async function sanitizeHtml(html: string): Promise<string> {
   if (!html) return '';
+  // Dynamic import to avoid bundling jsdom in serverless functions
+  const DOMPurify = (await import('isomorphic-dompurify')).default;
   return DOMPurify.sanitize(html, {
     ADD_TAGS: ['iframe'],
     ADD_ATTR: ['allow', 'allowfullscreen', 'frameborder', 'scrolling', 'target'],
