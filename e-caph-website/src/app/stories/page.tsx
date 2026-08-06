@@ -1,0 +1,75 @@
+import type { Metadata } from 'next';
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
+import { PageBanner } from '@/components/common/page-banner';
+import { Badge } from '@/components/ui/badge';
+import { siteConfig } from '@/config/site';
+import { createClient } from '@/lib/supabase/server';
+import { Calendar, BookOpen, ArrowRight } from 'lucide-react';
+import type { Post } from '@/types/database';
+
+export const metadata: Metadata = {
+  title: 'Stories & News',
+  description: `Field updates, reports, and news from ${siteConfig.name}.`,
+};
+
+export default async function StoriesPage() {
+  const supabase = await createClient();
+  const { data: dbPosts } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('status', 'published')
+    .order('published_at', { ascending: false });
+
+  const posts = (dbPosts as Post[] | null) || [];
+
+  return (
+    <div className="flex flex-col min-h-screen bg-[#F7FAF8] text-[#1E293B]">
+      <Header />
+
+      <PageBanner
+        title="Stories &amp; News"
+        subtitle="Field reports, community voices, research insights, and organizational announcements."
+      />
+
+      <section className="py-20 bg-white border-b border-[#E2E8F0]">
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {posts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {posts.map((post) => (
+                <article key={post.id} className="rounded-[10px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-white p-6 brand-shadow flex flex-col justify-between space-y-4">
+                  <div className="space-y-3">
+                    <Badge variant="secondary" className="text-[11px] uppercase bg-[#F3F9E9] text-[#6EA71F]">
+                      {post.post_type.replace('_', ' ')}
+                    </Badge>
+                    <h3 className="text-lg font-bold text-[#0092DF] leading-snug hover:text-[#007DC2] transition-colors">
+                      {post.title}
+                    </h3>
+                    <p className="text-xs text-[#64748B] line-clamp-3 leading-relaxed">{post.summary}</p>
+                  </div>
+                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {post.published_at ? new Date(post.published_at).toLocaleDateString() : 'Recent'}
+                    </span>
+                    <span className="text-[#E67817] font-bold inline-flex items-center">
+                      Read <ArrowRight className="w-3 h-3 ml-1" />
+                    </span>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-16 space-y-3">
+              <BookOpen className="w-12 h-12 text-[#94A3B8] mx-auto" />
+              <h3 className="text-lg font-bold text-[#1E293B]">Field Stories &amp; Articles</h3>
+              <p className="text-xs text-[#64748B]">Field reports and articles are currently being uploaded.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <Footer />
+    </div>
+  );
+}
