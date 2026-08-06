@@ -14,13 +14,15 @@ import {
   Mail,
   UserCheck,
   ExternalLink,
+  X,
 } from 'lucide-react';
 
 interface SidebarProps {
   unreadMessagesCount?: number;
+  onCloseMobile?: () => void;
 }
 
-export function AdminSidebar({ unreadMessagesCount = 2 }: SidebarProps) {
+export function AdminSidebar({ unreadMessagesCount = 2, onCloseMobile }: SidebarProps) {
   const pathname = usePathname();
 
   const navItems = [
@@ -41,11 +43,20 @@ export function AdminSidebar({ unreadMessagesCount = 2 }: SidebarProps) {
   ];
 
   return (
-    <aside className="w-64 bg-white border-r border-[#E2E8F0] min-h-screen flex flex-col justify-between font-sans shrink-0">
+    <aside className="w-64 bg-white border-r border-[#E2E8F0] h-full min-h-screen flex flex-col justify-between font-sans shrink-0">
       <div className="p-6 space-y-6">
-        {/* Logo Header */}
-        <div className="pb-4 border-b border-[#E2E8F0]">
+        {/* Logo & Close Button for Mobile */}
+        <div className="pb-4 border-b border-[#E2E8F0] flex items-center justify-between">
           <Logo />
+          {onCloseMobile && (
+            <button
+              onClick={onCloseMobile}
+              className="lg:hidden p-1.5 rounded-md hover:bg-slate-100 text-slate-500 transition-colors"
+              aria-label="Close sidebar"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Sidebar Nav */}
@@ -61,6 +72,7 @@ export function AdminSidebar({ unreadMessagesCount = 2 }: SidebarProps) {
               <Link
                 key={item.href}
                 href={item.href}
+                onClick={onCloseMobile}
                 className={`flex items-center justify-between px-3.5 py-2.5 rounded-[6px] transition-colors ${
                   isActive
                     ? 'bg-[#E6F4FC] text-[#0092DF] font-bold'
@@ -101,3 +113,4 @@ export function AdminSidebar({ unreadMessagesCount = 2 }: SidebarProps) {
     </aside>
   );
 }
+

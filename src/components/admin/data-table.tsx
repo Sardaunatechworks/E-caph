@@ -51,23 +51,23 @@ export function DataTable<T extends { id: string }>({
   });
 
   return (
-    <div className="bg-white rounded-[10px] border border-[#E2E8F0] brand-shadow space-y-4 font-sans">
+    <div className="bg-white rounded-[10px] border border-[#E2E8F0] brand-shadow space-y-4 font-sans overflow-hidden">
       {/* Header Bar */}
-      <div className="p-6 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E2E8F0]">
+      <div className="p-4 sm:p-6 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E2E8F0]">
         <div>
-          <h2 className="text-xl font-bold text-[#1E293B]">{title}</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-[#1E293B]">{title}</h2>
           {description && <p className="text-xs text-[#64748B] mt-0.5">{description}</p>}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3">
           {searchKey && (
-            <div className="relative w-64">
+            <div className="relative w-full sm:w-64">
               <Search className="w-4 h-4 text-[#94A3B8] absolute left-3 top-2.5" />
               <Input
                 placeholder={searchPlaceholder}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                className="pl-9 h-9 text-xs bg-[#F7FAF8] border-[#E2E8F0] rounded-[6px]"
+                className="pl-9 h-9 text-xs bg-[#F7FAF8] border-[#E2E8F0] rounded-[6px] w-full"
               />
             </div>
           )}
@@ -76,7 +76,7 @@ export function DataTable<T extends { id: string }>({
             <Button
               onClick={onAdd}
               size="sm"
-              className="bg-[#0092DF] hover:bg-[#007DC2] text-white font-bold text-xs gap-1.5 shrink-0"
+              className="bg-[#0092DF] hover:bg-[#007DC2] text-white font-bold text-xs gap-1.5 shrink-0 h-9"
             >
               <Plus className="w-4 h-4" />
               {addButtonLabel}
@@ -86,17 +86,17 @@ export function DataTable<T extends { id: string }>({
       </div>
 
       {/* Table Container */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full">
         <table className="w-full text-left text-xs text-[#1E293B]">
           <thead className="bg-[#F3F7F5] border-b border-[#E2E8F0] font-bold text-[#0092DF] uppercase tracking-wider text-[11px]">
             <tr>
               {columns.map((col, idx) => (
-                <th key={idx} className="px-6 py-3.5">
+                <th key={idx} className="px-4 sm:px-6 py-3.5 whitespace-nowrap">
                   {col.header}
                 </th>
               ))}
               {(onEdit || onDelete || onView) && (
-                <th className="px-6 py-3.5 text-right">Actions</th>
+                <th className="px-4 sm:px-6 py-3.5 text-right whitespace-nowrap">Actions</th>
               )}
             </tr>
           </thead>
@@ -105,12 +105,12 @@ export function DataTable<T extends { id: string }>({
               filteredData.map((row) => (
                 <tr key={row.id} className="hover:bg-[#F7FAF8] transition-colors">
                   {columns.map((col, idx) => (
-                    <td key={idx} className="px-6 py-4 whitespace-nowrap">
+                    <td key={idx} className="px-4 sm:px-6 py-4 whitespace-nowrap">
                       {col.cell ? col.cell(row) : col.accessorKey ? String(row[col.accessorKey] ?? '') : ''}
                     </td>
                   ))}
                   {(onEdit || onDelete || onView) && (
-                    <td className="px-6 py-4 whitespace-nowrap text-right space-x-2">
+                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-right space-x-1.5">
                       {onView && (
                         <button
                           onClick={() => onView(row)}
@@ -158,3 +158,4 @@ export function DataTable<T extends { id: string }>({
     </div>
   );
 }
+
