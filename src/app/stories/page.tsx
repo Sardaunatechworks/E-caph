@@ -14,14 +14,21 @@ export const metadata: Metadata = {
 };
 
 export default async function StoriesPage() {
-  const supabase = await createClient();
-  const { data: dbPosts } = await supabase
-    .from('posts')
-    .select('*')
-    .eq('status', 'published')
-    .order('published_at', { ascending: false });
+  let dbPosts: Post[] | null = null;
 
-  const posts = (dbPosts as Post[] | null) || [];
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from('posts')
+      .select('*')
+      .eq('status', 'published')
+      .order('published_at', { ascending: false });
+    dbPosts = data as Post[] | null;
+  } catch {
+    // Crash-proof fallback for Vercel deployment
+  }
+
+  const posts = dbPosts || [];
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7FAF8] text-[#1E293B]">

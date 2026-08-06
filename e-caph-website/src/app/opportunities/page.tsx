@@ -14,14 +14,21 @@ export const metadata: Metadata = {
 };
 
 export default async function OpportunitiesPage() {
-  const supabase = await createClient();
-  const { data: dbOpps } = await supabase
-    .from('opportunities')
-    .select('*')
-    .eq('is_open', true)
-    .order('created_at', { ascending: false });
+  let dbOpps: Opportunity[] | null = null;
 
-  const opportunities = (dbOpps as Opportunity[] | null) || [];
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from('opportunities')
+      .select('*')
+      .eq('is_open', true)
+      .order('created_at', { ascending: false });
+    dbOpps = data as Opportunity[] | null;
+  } catch {
+    // Crash-proof fallback for Vercel deployment
+  }
+
+  const opportunities = dbOpps || [];
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7FAF8] text-[#1E293B]">

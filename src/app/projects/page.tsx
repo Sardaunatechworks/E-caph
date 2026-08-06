@@ -14,14 +14,21 @@ export const metadata: Metadata = {
 };
 
 export default async function ProjectsPage() {
-  const supabase = await createClient();
-  const { data: dbProjects } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('is_published', true)
-    .order('created_at', { ascending: false });
+  let dbProjects: Project[] | null = null;
 
-  const projects = (dbProjects as Project[] | null) || [];
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from('projects')
+      .select('*')
+      .eq('is_published', true)
+      .order('created_at', { ascending: false });
+    dbProjects = data as Project[] | null;
+  } catch {
+    // Crash-proof fallback for Vercel deployment
+  }
+
+  const projects = dbProjects || [];
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7FAF8] text-[#1E293B]">

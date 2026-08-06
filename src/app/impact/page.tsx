@@ -14,14 +14,21 @@ export const metadata: Metadata = {
 };
 
 export default async function ImpactPage() {
-  const supabase = await createClient();
-  const { data: dbStats } = await supabase
-    .from('impact_statistics')
-    .select('*')
-    .eq('is_published', true)
-    .order('order_index', { ascending: true });
+  let dbStats: ImpactStatistic[] | null = null;
 
-  const stats = (dbStats as ImpactStatistic[] | null) || [];
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from('impact_statistics')
+      .select('*')
+      .eq('is_published', true)
+      .order('order_index', { ascending: true });
+    dbStats = data as ImpactStatistic[] | null;
+  } catch {
+    // Crash-proof fallback for Vercel deployment
+  }
+
+  const stats = dbStats || [];
 
   const defaultStats = [
     { label: 'Young People Reached', value: '95,000+', icon: Users },
@@ -50,7 +57,9 @@ export default async function ImpactPage() {
             {stats.length > 0
               ? stats.map((stat) => (
                   <div key={stat.id} className="p-8 rounded-[10px] bg-[#F3F7F5] border border-[#E2E8F0] brand-shadow text-center space-y-2">
-                    <div className="text-4xl font-extrabold text-[#0092DF]">{stat.value}{stat.suffix || ''}</div>
+                    <div className="text-4xl font-extrabold text-[#0092DF]">
+                      {(stat.value ?? stat.numeric_value ?? 0).toLocaleString()}{stat.suffix || ''}
+                    </div>
                     <div className="text-xs font-bold text-[#86C127] uppercase tracking-wider">{stat.label}</div>
                   </div>
                 ))

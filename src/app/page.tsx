@@ -13,11 +13,16 @@ import { ArrowRight, Award, Sparkles, BookOpen, Users, HeartPulse, ShieldCheck, 
 import type { TeamMember, Post, Project, Programme, ImpactStatistic } from '@/types/database';
 
 export default async function HomePage() {
-  const supabase = await createClient();
+  let programmes: Programme[] = [];
+  let projects: Project[] = [];
+  let stats: ImpactStatistic[] = [];
+  let posts: Post[] = [];
+  let teamMembers: TeamMember[] = [];
 
-  // Fetch real data from Supabase database tables
-  const [{ data: dbProgrammes }, { data: dbProjects }, { data: dbStats }, { data: dbPosts }, { data: dbTeam }] =
-    await Promise.all([
+  // Crash-proof Supabase data fetching for Vercel deployment
+  try {
+    const supabase = await createClient();
+    const [resProg, resProj, resStat, resPost, resTeam] = await Promise.all([
       supabase.from('programmes').select('*').eq('is_published', true).order('order_index', { ascending: true }),
       supabase.from('projects').select('*').eq('is_published', true).order('created_at', { ascending: false }),
       supabase.from('impact_statistics').select('*').eq('is_published', true).order('order_index', { ascending: true }),
@@ -25,11 +30,14 @@ export default async function HomePage() {
       supabase.from('team_members').select('*').eq('is_active', true).order('order_index', { ascending: true }).limit(4),
     ]);
 
-  const programmes = (dbProgrammes as Programme[] | null) || [];
-  const projects = (dbProjects as Project[] | null) || [];
-  const stats = (dbStats as ImpactStatistic[] | null) || [];
-  const posts = (dbPosts as Post[] | null) || [];
-  const teamMembers = (dbTeam as TeamMember[] | null) || [];
+    programmes = (resProg.data as Programme[] | null) || [];
+    projects = (resProj.data as Project[] | null) || [];
+    stats = (resStat.data as ImpactStatistic[] | null) || [];
+    posts = (resPost.data as Post[] | null) || [];
+    teamMembers = (resTeam.data as TeamMember[] | null) || [];
+  } catch {
+    // If Supabase env variables are not set or network fails on Vercel, render fallbacks safely without 500 error
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7FAF8] text-[#1E293B] font-sans">
@@ -141,7 +149,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. Thematic Focus Areas (Fetched Real Data or Schema Mapping) */}
+      {/* 4. Thematic Focus Areas */}
       <section className="py-20 bg-white border-b border-[#E2E8F0]">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
@@ -178,7 +186,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 5. Impact Statistics Section (Fetched Real Data) */}
+      {/* 5. Impact Statistics Section */}
       <section className="py-16 bg-[#F3F7F5] border-b border-[#E2E8F0]">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
@@ -230,7 +238,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 6. Flagship Initiatives (Fetched Real Data) */}
+      {/* 6. Flagship Initiatives */}
       <section className="py-20 bg-white border-b border-[#E2E8F0]">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">

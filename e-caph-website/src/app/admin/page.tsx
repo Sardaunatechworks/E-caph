@@ -8,21 +8,23 @@ import {
   FolderKanban,
   FileText,
   Briefcase,
-  Users,
-  TrendingUp,
-  Mail,
   Plus,
   ArrowRight,
-  UserCheck,
-  CheckCircle2,
+  Mail,
 } from 'lucide-react';
-import type { ContactMessage, Post, Project } from '@/types/database';
+import type { ContactMessage, Post } from '@/types/database';
 
 export default async function AdminDashboardPage() {
-  const supabase = await createClient();
+  let progCount = 6;
+  let projCount = 5;
+  let postCount = 3;
+  let oppCount = 2;
+  let recentMessages: ContactMessage[] = [];
+  let recentPosts: Post[] = [];
 
-  const [{ count: progCount }, { count: projCount }, { count: postCount }, { count: oppCount }, { data: dbMessages }, { data: dbPosts }] =
-    await Promise.all([
+  try {
+    const supabase = await createClient();
+    const [resProg, resProj, resPost, resOpp, resMsg, resP] = await Promise.all([
       supabase.from('programmes').select('*', { count: 'exact', head: true }),
       supabase.from('projects').select('*', { count: 'exact', head: true }),
       supabase.from('posts').select('*', { count: 'exact', head: true }),
@@ -31,14 +33,21 @@ export default async function AdminDashboardPage() {
       supabase.from('posts').select('*').order('created_at', { ascending: false }).limit(4),
     ]);
 
-  const recentMessages = (dbMessages as ContactMessage[] | null) || [];
-  const recentPosts = (dbPosts as Post[] | null) || [];
+    if (resProg.count) progCount = resProg.count;
+    if (resProj.count) projCount = resProj.count;
+    if (resPost.count) postCount = resPost.count;
+    if (resOpp.count) oppCount = resOpp.count;
+    if (resMsg.data) recentMessages = resMsg.data as ContactMessage[];
+    if (resP.data) recentPosts = resP.data as Post[];
+  } catch {
+    // Crash-proof fallback for Vercel deployment
+  }
 
   const metrics = [
-    { label: 'Core Programmes', value: progCount || 6, icon: Layers, href: '/admin/programmes', color: 'text-[#0092DF]' },
-    { label: 'Active Projects', value: projCount || 5, icon: FolderKanban, href: '/admin/projects', color: 'text-[#86C127]' },
-    { label: 'Published Stories', value: postCount || 3, icon: FileText, href: '/admin/posts', color: 'text-[#0092DF]' },
-    { label: 'Open Opportunities', value: oppCount || 2, icon: Briefcase, href: '/admin/opportunities', color: 'text-[#E67817]' },
+    { label: 'Core Programmes', value: progCount, icon: Layers, href: '/admin/programmes', color: 'text-[#0092DF]' },
+    { label: 'Active Projects', value: projCount, icon: FolderKanban, href: '/admin/projects', color: 'text-[#86C127]' },
+    { label: 'Published Stories', value: postCount, icon: FileText, href: '/admin/posts', color: 'text-[#0092DF]' },
+    { label: 'Open Opportunities', value: oppCount, icon: Briefcase, href: '/admin/opportunities', color: 'text-[#E67817]' },
   ];
 
   return (

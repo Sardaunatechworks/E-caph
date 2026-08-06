@@ -85,15 +85,22 @@ const defaultTeamMembers = [
 ];
 
 export default async function TeamPage() {
-  const supabase = await createClient();
-  const { data: dbMembers } = await supabase
-    .from('team_members')
-    .select('*')
-    .eq('is_active', true)
-    .order('order_index', { ascending: true });
+  let dbMembers: TeamMember[] | null = null;
+
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase
+      .from('team_members')
+      .select('*')
+      .eq('is_active', true)
+      .order('order_index', { ascending: true });
+    dbMembers = data as TeamMember[] | null;
+  } catch {
+    // Graceful fallback for Vercel deployment
+  }
 
   const teamMembers = (dbMembers && dbMembers.length > 0)
-    ? (dbMembers as TeamMember[])
+    ? dbMembers
     : (defaultTeamMembers as unknown as TeamMember[]);
 
   return (
