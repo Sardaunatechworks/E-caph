@@ -6,7 +6,7 @@ import { Logo } from '@/components/common/logo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { createClient } from '@/lib/supabase/client';
-import { Lock, Mail, ArrowRight, ShieldCheck, AlertCircle, Key, CheckCircle2 } from 'lucide-react';
+import { Lock, Mail, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 function AdminLoginForm() {
   const router = useRouter();
@@ -32,7 +32,7 @@ function AdminLoginForm() {
   const setAuthSessionCookie = () => {
     document.cookie = 'ecaph_admin_session=authenticated; path=/; max-age=86400; SameSite=Lax';
     if (typeof window !== 'undefined') {
-      localStorage.setItem('ecaph_admin_user', JSON.stringify({ email: email || 'admin@e-caph.org', role: 'Super Admin' }));
+      localStorage.setItem('ecaph_admin_user', JSON.stringify({ email }));
     }
   };
 
@@ -49,54 +49,29 @@ function AdminLoginForm() {
         password,
       });
 
-      if (error) {
-        if (
-          (email === 'admin@e-caph.org' && password === 'admin123') ||
-          email.toLowerCase().includes('admin') ||
-          email.toLowerCase().includes('e-caph')
-        ) {
-          setAuthSessionCookie();
-          setSuccessMsg('Authentication successful! Accessing CMS Portal...');
-          setTimeout(() => {
-            router.push(nextUrl);
-          }, 400);
-          return;
-        }
-        setErrorMsg(error.message || 'Invalid email or password.');
-      } else if (data.session) {
+      if (error || !data.session) {
+        setErrorMsg(error?.message || 'Authentication failed. Invalid email or password.');
+      } else {
         setAuthSessionCookie();
-        setSuccessMsg('Authentication verified. Loading dashboard...');
+        setSuccessMsg('Authentication verified. Redirecting to dashboard...');
         setTimeout(() => {
           router.push(nextUrl);
         }, 400);
       }
     } catch {
-      if (email) {
-        setAuthSessionCookie();
-        setSuccessMsg('Session initialized. Accessing CMS Portal...');
-        setTimeout(() => {
-          router.push(nextUrl);
-        }, 400);
-      } else {
-        setErrorMsg('Please provide valid administrative credentials.');
-      }
+      setErrorMsg('Unable to connect to authentication server. Please check your credentials.');
     } finally {
       setLoading(false);
     }
   };
 
-  const fillDemoCredentials = () => {
-    setEmail('admin@e-caph.org');
-    setPassword('admin123');
-  };
-
   return (
-    <div className="w-full max-w-md bg-white rounded-xl border border-slate-200 shadow-2xl p-8 space-y-6 relative z-10">
+    <div className="w-full max-w-md bg-white rounded-xl border border-slate-200 shadow-2xl p-8 space-y-6 relative z-10 font-sans">
       {/* Centered Logo & Header */}
       <div className="flex flex-col items-center justify-center text-center space-y-3 pb-4 border-b border-slate-100">
         <Logo />
         <div className="space-y-1">
-          <h2 className="text-xl font-black text-[#0092DF]">CMS Security Portal</h2>
+          <h2 className="text-xl font-black text-[#0092DF]">CMS Portal</h2>
           <p className="text-xs text-slate-500 font-medium">
             Enhancing Communities Action for Peace &amp; Better Health Initiative
           </p>
@@ -132,7 +107,7 @@ function AdminLoginForm() {
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
             <Mail className="w-3.5 h-3.5 text-[#0092DF]" />
-            Admin Email Address
+            Email Address
           </label>
           <Input
             type="email"
@@ -147,7 +122,7 @@ function AdminLoginForm() {
         <div className="space-y-1.5">
           <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
             <Lock className="w-3.5 h-3.5 text-[#0092DF]" />
-            Secret Password
+            Password
           </label>
           <Input
             type="password"
@@ -164,29 +139,10 @@ function AdminLoginForm() {
           disabled={loading}
           className="w-full bg-[#0092DF] hover:bg-[#007DC2] text-white font-bold h-10 text-xs shadow-md shadow-[#0092DF]/20 transition-all"
         >
-          {loading ? 'Authenticating Credentials...' : 'Authenticate & Sign In'}
+          {loading ? 'Authenticating...' : 'Sign In'}
           <ArrowRight className="w-4 h-4 ml-1.5 text-[#E67817]" />
         </Button>
       </form>
-
-      {/* Quick Demo Credentials Preset Button */}
-      <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-        <button
-          type="button"
-          onClick={fillDemoCredentials}
-          className="text-[11px] font-bold text-[#0092DF] hover:text-[#007DC2] flex items-center gap-1 hover:underline cursor-pointer"
-        >
-          <Key className="w-3 h-3 text-[#E67817]" /> Fill Quick Demo Credentials
-        </button>
-        <span className="text-[10px] text-slate-400 font-semibold">Role-Based Access Control</span>
-      </div>
-
-      {/* Footer Security Badge */}
-      <div className="text-center pt-2">
-        <span className="text-[11px] text-slate-400 flex items-center justify-center gap-1">
-          <ShieldCheck className="w-3.5 h-3.5 text-[#86C127]" /> 256-Bit Encrypted Admin Session
-        </span>
-      </div>
     </div>
   );
 }
@@ -200,7 +156,7 @@ export default function AdminLoginPage() {
 
       <Suspense fallback={
         <div className="w-full max-w-md bg-white rounded-xl p-8 text-center text-xs font-bold text-[#0092DF]">
-          Loading Security Portal...
+          Loading CMS Portal...
         </div>
       }>
         <AdminLoginForm />
@@ -208,5 +164,6 @@ export default function AdminLoginPage() {
     </div>
   );
 }
+
 
 
