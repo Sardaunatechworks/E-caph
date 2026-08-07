@@ -8,7 +8,7 @@ export const siteConfig = {
   name: 'e-CAPH',
   fullName: 'Enhancing Communities Action for Peace and Better Health Initiative',
   description:
-    'A youth-led non-profit organization committed to driving sustainable development and community resilience across Nigeria, operating at the intersection of human rights, public health, and civic empowerment.',
+    'The Enhancing Communities Action for Peace and Better Health Initiative (e-CAPH) is a community-driven, non-profit organization dedicated to promoting peace, improving health outcomes, and advancing sustainable development among adolescents, women, young people, and underserved populations in Nigeria.',
   url: process.env.NEXT_PUBLIC_SITE_URL || 'https://e-caph.org',
   ogImage: '/images/og-default.jpg',
   email: 'caph4dev35@gmail.com',

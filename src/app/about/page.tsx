@@ -29,13 +29,16 @@ export default function AboutPage() {
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-6 max-w-4xl">
           <Badge variant="secondary">Organizational Identity</Badge>
           <h2 className="text-3xl font-extrabold text-[#0092DF]">
-            Action for Peace and Better Health Initiative
+            Enhancing Communities Action for Peace and Better Health Initiative
           </h2>
           <p className="text-base text-[#64748B] leading-relaxed">
-            {siteConfig.description}
+            The Enhancing Communities Action for Peace and Better Health Initiative (e-CAPH) is a community-driven, non-profit organization dedicated to promoting peace, improving health outcomes, and advancing sustainable development among adolescents, women, young people, and underserved populations in Nigeria.
           </p>
           <p className="text-base text-[#64748B] leading-relaxed">
-            Operating from Kaduna, Nigeria, e-CAPH creates grassroots programs that empower communities, protect human rights, and foster social cohesion through youth-led action.
+            Founded on the understanding that peace, health, and development are deeply interconnected, e-CAPH works to strengthen community systems, empower local actors, and bridge gaps between communities and government institutions. Our interventions are designed to address the root causes of poor health outcomes, social exclusion, and vulnerability through inclusive participation, evidence-based programming, and accountability mechanisms.
+          </p>
+          <p className="text-base text-[#64748B] leading-relaxed">
+            e-CAPH is recognized for its leadership in adolescent and reproductive health, maternal and child health, gender-based violence prevention and response, community engagement, and the strategic use of digital tools to improve service delivery and decision-making.
           </p>
         </div>
       </section>
@@ -63,23 +66,77 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Technical Approaches */}
+      {/* Impact & Measurable Contributions */}
       <section className="py-16 bg-white border-b border-[#E2E8F0]">
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8 max-w-4xl">
+          <div className="space-y-3">
+            <Badge variant="secondary">Measurable Impact</Badge>
+            <h2 className="text-3xl font-extrabold text-[#0092DF]">Our Contributions to Communities</h2>
+            <p className="text-sm text-[#64748B]">e-CAPH has made measurable contributions to peacebuilding and improved health outcomes across communities by:</p>
+          </div>
+          <ul className="space-y-4 text-sm text-[#64748B]">
+            <li className="flex items-start gap-3">
+              <span className="w-2 h-2 rounded-full bg-[#86C127] mt-2 shrink-0"></span>
+              <span>Reaching thousands of adolescents, women, and families with essential health information and services.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="w-2 h-2 rounded-full bg-[#86C127] mt-2 shrink-0"></span>
+              <span>Improving ANC attendance, facility delivery, immunisation follow-up, and family planning uptake through community-based tracking and digital tools (such as the ANC Tracker).</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="w-2 h-2 rounded-full bg-[#86C127] mt-2 shrink-0"></span>
+              <span>Strengthening GBV prevention and response systems, improving access to referral services and survivor support.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="w-2 h-2 rounded-full bg-[#86C127] mt-2 shrink-0"></span>
+              <span>Building the capacity of community volunteers, youth champions, health workers, and civil society actors.</span>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="w-2 h-2 rounded-full bg-[#86C127] mt-2 shrink-0"></span>
+              <span>Supporting policy dialogue, community accountability platforms, and multi-stakeholder engagement that promote inclusive and responsive governance.</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      {/* Why e-CAPH / Core Strengths */}
+      <section className="py-16 bg-[#F3F7F5] border-b border-[#E2E8F0]">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <Badge variant="secondary">Methodology</Badge>
-            <h2 className="text-3xl font-extrabold text-[#0092DF]">How We Operate</h2>
+            <Badge variant="secondary">Why Choose e-CAPH</Badge>
+            <h2 className="text-3xl font-extrabold text-[#0092DF]">Rooted in Communities &amp; Driven by Results</h2>
           </div>
-          <div className="space-y-4 max-w-4xl mx-auto">
-            {technicalApproaches.map((item) => (
-              <div key={item.number} className="p-6 rounded-[10px] border border-[#E2E8F0] bg-[#F7FAF8] flex items-start gap-6">
-                <span className="text-2xl font-extrabold text-[#E67817] shrink-0">{item.number}</span>
-                <div className="space-y-1">
-                  <h4 className="text-lg font-bold text-[#0092DF]">{item.title}</h4>
-                  <p className="text-sm text-[#64748B] leading-relaxed">{item.description}</p>
-                </div>
-              </div>
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="p-6 rounded-[10px] bg-white border border-[#E2E8F0] border-t-4 border-t-[#86C127] brand-shadow space-y-3">
+              <h4 className="text-base font-bold text-[#0092DF]">Rooted in Communities</h4>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                Grounded in long-standing relationships with communities, traditional structures, youth groups, and frontline health workers.
+              </p>
+            </div>
+            <div className="p-6 rounded-[10px] bg-white border border-[#E2E8F0] border-t-4 border-t-[#86C127] brand-shadow space-y-3">
+              <h4 className="text-base font-bold text-[#0092DF]">Bridging Communities &amp; Systems</h4>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                Effectively connecting community realities with government systems and policies so citizen voices inform planning, budgeting, and service delivery.
+              </p>
+            </div>
+            <div className="p-6 rounded-[10px] bg-white border border-[#E2E8F0] border-t-4 border-t-[#86C127] brand-shadow space-y-3">
+              <h4 className="text-base font-bold text-[#0092DF]">Evidence &amp; Innovation Driven</h4>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                Through tools such as the ANC Tracker, using data and technology to strengthen accountability, improve decision-making, and enhance service uptake.
+              </p>
+            </div>
+            <div className="p-6 rounded-[10px] bg-white border border-[#E2E8F0] border-t-4 border-t-[#86C127] brand-shadow space-y-3">
+              <h4 className="text-base font-bold text-[#0092DF]">Proven Experience &amp; Results</h4>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                Years of hands-on implementation across diverse LGAs delivering measurable, scalable results aligned with national development priorities.
+              </p>
+            </div>
+            <div className="p-6 rounded-[10px] bg-white border border-[#E2E8F0] border-t-4 border-t-[#86C127] brand-shadow space-y-3">
+              <h4 className="text-base font-bold text-[#0092DF]">Strong Strategic Partnerships</h4>
+              <p className="text-xs text-[#64748B] leading-relaxed">
+                Collaborating with government institutions, development partners, and civil society to expand reach, influence policy, and sustain impact.
+              </p>
+            </div>
           </div>
         </div>
       </section>
