@@ -10,6 +10,9 @@ import { createClient } from '@/lib/supabase/server';
 import { Mail, Linkedin, ArrowRight, HeartPulse, Users, ShieldCheck } from 'lucide-react';
 import type { TeamMember } from '@/types/database';
 
+export const revalidate = 0;
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Our Team',
   description: `Meet the leadership and passionate team behind ${siteConfig.fullName}.`,

@@ -1,28 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120" width="100%" height="100%">
-  <defs>
-    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#176B4D;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#0B3D2E;stop-opacity:1" />
-    </linearGradient>
-    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#B7D84B;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#9BBF2E;stop-opacity:1" />
-    </linearGradient>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 120" width="100%" height="100%">
+  <!-- Official e-CAPH Logo Mark -->
+  <g transform="translate(10, 5)">
+    <!-- Top-Right Figure (Green) -->
+    <circle cx="76" cy="22" r="13" fill="#84C225" />
+    <path
+      d="M 44 20 C 65 10, 88 12, 96 28 C 104 46, 94 76, 74 96 C 68 102, 60 106, 56 107 C 68 93, 83 72, 80 46 C 78 32, 66 25, 44 20 Z"
+      fill="#84C225"
+    />
 
-  <!-- Brand Icon -->
-  <g transform="translate(10, 10)">
-    <!-- Outer Shield / Circle -->
-    <rect x="0" y="0" width="100" height="100" rx="24" fill="url(#grad1)" />
-    <!-- Peace & Health Leaf Symbol -->
-    <path d="M 50 20 C 30 35 25 65 50 80 C 75 65 70 35 50 20 Z" fill="url(#grad2)" />
-    <path d="M 50 20 L 50 80" stroke="#176B4D" stroke-width="3" stroke-linecap="round" />
-    <!-- Heart / Peace accent -->
-    <circle cx="50" cy="42" r="8" fill="#FFFFFF" opacity="0.9" />
+    <!-- Left Figure (Orange) -->
+    <circle cx="38" cy="36" r="11" fill="#E87A1E" />
+    <path
+      d="M 32 46 C 24 64, 28 88, 48 104 C 54 108, 59 108, 59 108 C 45 105, 32 92, 26 76 C 20 60, 24 48, 32 46 Z"
+      fill="#E87A1E"
+    />
+
+    <!-- Center Figure (Blue) -->
+    <circle cx="60" cy="46" r="9" fill="#0090DF" />
+    <path
+      d="M 42 56 C 54 48, 70 48, 78 58 C 72 78, 64 96, 54 104 C 62 90, 68 72, 64 62 C 60 55, 50 54, 42 56 Z"
+      fill="#0090DF"
+    />
   </g>
 
-  <!-- Typography -->
-  <text x="125" y="62" font-family="'Manrope', 'Inter', sans-serif" font-weight="900" font-size="46" fill="#176B4D" letter-spacing="-1">e-CAPH</text>
-  <text x="125" y="84" font-family="'Inter', sans-serif" font-weight="700" font-size="12" fill="#617069" letter-spacing="1.5">ACTION FOR PEACE &amp; HEALTH</text>
-  <text x="125" y="98" font-family="'Inter', sans-serif" font-weight="500" font-size="10" fill="#9CA3AF" letter-spacing="0.5">NIGERIA</text>
+  <!-- RC Number -->
+  <text x="215" y="52" font-family="'Inter', 'Arial', sans-serif" font-weight="800" font-size="13" fill="#333333" letter-spacing="0.5">RC:144280</text>
+
+  <!-- e-CAPH Typography -->
+  <text x="125" y="92" font-family="'Inter', 'Arial', sans-serif" font-weight="900" font-size="52" fill="#0090DF" letter-spacing="-1">e-CAPH</text>
 </svg>
