@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { createClient } from '@/lib/supabase/client';
+import { Upload, X, Camera } from 'lucide-react';
 
 interface TeamRecord {
   id: string;
@@ -27,6 +28,7 @@ export default function AdminTeamPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<TeamRecord | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   const [formData, setFormData] = useState<Omit<TeamRecord, 'id'>>({
     full_name: '',
@@ -38,6 +40,50 @@ export default function AdminTeamPage() {
     is_active: true,
     order_index: 1,
   });
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+
+    try {
+      // 1. Read file locally as Data URL for instant display
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64Url = event.target?.result as string;
+        setFormData((prev) => ({ ...prev, avatar_url: base64Url }));
+
+        // 2. Attempt Supabase Storage upload if available
+        try {
+          const supabase = createClient();
+          const fileExt = file.name.split('.').pop();
+          const fileName = `team_${Date.now()}.${fileExt}`;
+          const filePath = `avatars/${fileName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from('media')
+            .upload(filePath, file, { upsert: true });
+
+          if (!uploadError) {
+            const { data: publicUrlData } = supabase.storage
+              .from('media')
+              .getPublicUrl(filePath);
+            if (publicUrlData?.publicUrl) {
+              setFormData((prev) => ({ ...prev, avatar_url: publicUrlData.publicUrl }));
+            }
+          }
+        } catch {
+          // Supabase storage optional fallback
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Image upload failed:', err);
+    } finally {
+      setUploadingImage(false);
+    }
+  };
 
   const fetchTeamMembers = async () => {
     setLoading(true);
@@ -268,14 +314,58 @@ export default function AdminTeamPage() {
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-xs font-bold text-[#1E293B]">Profile Picture URL (Avatar)</label>
-            <Input
-              value={formData.avatar_url}
-              onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-              placeholder="https://example.com/avatar.jpg"
-              className="bg-white border-[#E2E8F0] h-10 text-xs rounded-[6px]"
-            />
+          {/* Local Image File Uploader */}
+          <div className="space-y-2">
+            <label className="text-xs font-bold text-[#1E293B]">Profile Picture (Avatar)</label>
+
+            <div className="flex items-center gap-4 p-3 border border-[#E2E8F0] rounded-[8px] bg-[#F8FAFC]">
+              {/* Avatar Preview Box */}
+              <div className="w-14 h-14 rounded-[8px] bg-[#0092DF] text-white flex items-center justify-center text-lg font-bold shrink-0 overflow-hidden shadow-sm relative">
+                {formData.avatar_url ? (
+                  <img src={formData.avatar_url} alt="Preview" className="w-full h-full object-cover" />
+                ) : (
+                  formData.full_name ? formData.full_name.split(' ').map(n => n[0]).join('').slice(0, 2) : <Camera className="w-6 h-6" />
+                )}
+              </div>
+
+              <div className="flex-1 space-y-2">
+                <div className="flex items-center gap-2">
+                  <label className="cursor-pointer inline-flex items-center gap-2 px-3 py-1.5 bg-[#0092DF] hover:bg-[#007DC2] text-white font-bold text-xs rounded-[6px] transition-colors shadow-sm">
+                    <Upload className="w-3.5 h-3.5" />
+                    {uploadingImage ? 'Uploading...' : 'Choose File from Computer'}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileUpload}
+                      className="hidden"
+                    />
+                  </label>
+
+                  {formData.avatar_url && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setFormData({ ...formData, avatar_url: '' })}
+                      className="text-xs text-rose-600 hover:text-rose-700 hover:bg-rose-50 h-8"
+                    >
+                      <X className="w-3.5 h-3.5 mr-1" /> Remove
+                    </Button>
+                  )}
+                </div>
+
+                <p className="text-[11px] text-[#64748B]">
+                  Select an image file (JPG, PNG, WEBP) from your local computer or paste a URL below.
+                </p>
+
+                <Input
+                  value={formData.avatar_url}
+                  onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
+                  placeholder="Or paste image URL (https://...)"
+                  className="bg-white border-[#E2E8F0] h-8 text-[11px] rounded-[4px]"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
