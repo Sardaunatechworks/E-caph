@@ -1,6 +1,6 @@
 -- ============================================================================
 -- e-CAPH: Master Supabase Database Schema & Storage Setup
--- Run this script in your Supabase Dashboard -> SQL Editor to create all tables!
+-- Idempotent script: Safe to run multiple times in Supabase SQL Editor!
 -- ============================================================================
 
 -- 1. STORAGE BUCKET SETUP FOR MEDIA & DOCUMENTS
@@ -9,9 +9,11 @@ VALUES ('media', 'media', true)
 ON CONFLICT (id) DO UPDATE SET public = true;
 
 -- Bucket Public Read Policy
+DROP POLICY IF EXISTS "Public Read Media Storage" ON storage.objects;
 CREATE POLICY "Public Read Media Storage" ON storage.objects
   FOR SELECT USING (bucket_id = 'media');
 
+DROP POLICY IF EXISTS "Admin Write Media Storage" ON storage.objects;
 CREATE POLICY "Admin Write Media Storage" ON storage.objects
   FOR ALL USING (bucket_id = 'media');
 
@@ -135,10 +137,16 @@ VALUES
   ('30000000-0000-0000-0000-000000000002', 'Barr. Usman Danjuma', 'Board Trustee & Legal Counsel', 'Human rights lawyer and legal reform advocate.', 'info@e-caph.org', 2, true),
   ('30000000-0000-0000-0000-000000000003', 'Prof. Aliyu Bawa', 'Trustee - Health Research & Evaluation', 'Professor of Community Medicine and Epidemiology.', 'info@e-caph.org', 3, true),
   ('30000000-0000-0000-0000-000000000004', 'Hajiya Amina Bello', 'Trustee - Gender & Peace Cohesion', 'Grassroots peace mediator and women advocate.', 'info@e-caph.org', 4, true)
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+  full_name = EXCLUDED.full_name,
+  board_role = EXCLUDED.board_role,
+  bio = EXCLUDED.bio;
 
 INSERT INTO public.download_resources (id, title, slug, description, category, file_url, file_size, downloads_count, is_published)
 VALUES
   ('40000000-0000-0000-0000-000000000001', 'e-CAPH Annual Impact Report 2025-2026', 'e-caph-annual-impact-report-2025-2026', 'Comprehensive annual report highlighting key achievements.', 'Annual Report', 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf', '3.2 MB', 142, true),
   ('40000000-0000-0000-0000-000000000002', 'Policy Brief: Digital ANC Tracking & Primary Healthcare Delivery', 'policy-brief-digital-anc-tracking-kaduna', 'Evidence-based policy brief examining the impact of digital tracking tools.', 'Policy Brief', 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf', '1.8 MB', 89, true)
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title,
+  slug = EXCLUDED.slug,
+  description = EXCLUDED.description;
