@@ -18,60 +18,6 @@ export const metadata: Metadata = {
   description: `Read the latest articles, research insights, and field perspectives from ${siteConfig.fullName}.`,
 };
 
-const defaultBlogPosts: Post[] = [
-  {
-    id: '1',
-    author_id: null,
-    category_id: null,
-    programme_id: null,
-    project_id: null,
-    title: 'Transforming Community Health Through Digital Antenatal Care Tracking',
-    slug: 'transforming-community-health-digital-anc-tracking',
-    summary: 'How e-CAPH frontline healthcare volunteers are using mobile tracking tools to register pregnant mothers, track immunization schedules, and improve maternal survival in rural communities.',
-    content: `Antenatal care (ANC) is one of the single most effective health interventions for reducing maternal and neonatal mortality...`,
-    featured_image: null,
-    post_type: 'article',
-    status: 'published',
-    published_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    author_id: null,
-    category_id: null,
-    programme_id: null,
-    project_id: null,
-    title: 'Youth Leadership & Grassroots Conflict Mediation in Northern Nigeria',
-    slug: 'youth-leadership-grassroots-conflict-mediation',
-    summary: 'Empowering young advocates to bridge inter-faith dialogues, resolve community disputes, and build lasting social cohesion across local government councils.',
-    content: `Peace is the foundational prerequisite for health, education, and economic resilience...`,
-    featured_image: null,
-    post_type: 'article',
-    status: 'published',
-    published_at: new Date(Date.now() - 86400000 * 5).toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    author_id: null,
-    category_id: null,
-    programme_id: null,
-    project_id: null,
-    title: 'Advocating for Gender Inclusion & GBV Prevention Mechanisms',
-    slug: 'advocating-gender-inclusion-gbv-prevention',
-    summary: 'A deep dive into community survivor support systems, referral pathway networks, and grassroots advocacy for survivor-centered care.',
-    content: `Gender-based violence remains a significant barrier to health, education, and human development...`,
-    featured_image: null,
-    post_type: 'article',
-    status: 'published',
-    published_at: new Date(Date.now() - 86400000 * 10).toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
-
 export default async function BlogPage() {
   let dbPosts: Post[] | null = null;
 
@@ -84,10 +30,10 @@ export default async function BlogPage() {
       .order('published_at', { ascending: false });
     dbPosts = data as Post[] | null;
   } catch {
-    // Fallback
+    // Crash-proof fallback for Vercel deployment
   }
 
-  const posts = dbPosts && dbPosts.length > 0 ? dbPosts : defaultBlogPosts;
+  const posts = dbPosts || [];
   const featuredPost = posts[0];
   const remainingPosts = posts.slice(1);
 

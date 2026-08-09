@@ -13,80 +13,17 @@ import { createClient } from '@/lib/supabase/client';
 import { FileText, Download, Eye, Search, Filter, BookOpen } from 'lucide-react';
 import type { DownloadResource } from '@/types/database';
 
-const defaultResources: DownloadResource[] = [
-  {
-    id: '1',
-    title: 'e-CAPH Annual Impact Report 2025-2026',
-    slug: 'e-caph-annual-impact-report-2025-2026',
-    description: 'Comprehensive annual report highlighting key achievements across adolescent health, maternal ANC tracking, peacebuilding forums, and community governance in Nigeria.',
-    category: 'Annual Report',
-    file_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
-    file_size: '3.2 MB',
-    file_type: 'application/pdf',
-    downloads_count: 142,
-    is_published: true,
-    published_date: new Date().toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    title: 'Policy Brief: Digital ANC Tracking & Primary Healthcare Delivery in Kaduna',
-    slug: 'policy-brief-digital-anc-tracking-kaduna',
-    description: 'Evidence-based policy brief examining the impact of digital tracking tools on 4th-visit antenatal care attendance and primary facility drug supply transparency.',
-    category: 'Policy Brief',
-    file_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
-    file_size: '1.8 MB',
-    file_type: 'application/pdf',
-    downloads_count: 89,
-    is_published: true,
-    published_date: new Date().toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    title: 'Youth Dialogue & Conflict Resolution Facilitation Guide',
-    slug: 'youth-dialogue-conflict-resolution-guide',
-    description: 'A practical training toolkit designed for community peace ambassadors, youth advocates, and civil society leaders conducting inter-faith and community dialogues.',
-    category: 'Tool/Guide',
-    file_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
-    file_size: '4.5 MB',
-    file_type: 'application/pdf',
-    downloads_count: 215,
-    is_published: true,
-    published_date: new Date().toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '4',
-    title: 'Gender-Based Violence Referral & Case Tracking Framework',
-    slug: 'gbv-referral-case-tracking-framework',
-    description: 'Standard operating procedure and community documentation framework for GBV response teams, survivors advocacy groups, and referral health centers.',
-    category: 'Research Paper',
-    file_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
-    file_size: '2.1 MB',
-    file_type: 'application/pdf',
-    downloads_count: 110,
-    is_published: true,
-    published_date: new Date().toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
-
 const categories = ['All Categories', 'Annual Report', 'Policy Brief', 'Research Paper', 'Tool/Guide'];
 
 export default function ResourcesPage() {
-  const [resources, setResources] = useState<DownloadResource[]>(defaultResources);
+  const [resources, setResources] = useState<DownloadResource[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [selectedResourceForView, setSelectedResourceForView] = useState<DownloadResource | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
 
   const fetchResources = async () => {
-    let currentList = defaultResources;
+    let currentList: DownloadResource[] = [];
 
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_download_resources');

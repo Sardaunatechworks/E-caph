@@ -87,6 +87,15 @@ export default function AdminTeamPage() {
 
   const fetchTeamMembers = async () => {
     setLoading(true);
+    let currentList: TeamRecord[] = [];
+
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ecaph_team_members');
+      if (saved) {
+        try { currentList = JSON.parse(saved); } catch {}
+      }
+    }
+
     try {
       const supabase = createClient();
       const { data: dbData, error } = await supabase
@@ -94,70 +103,13 @@ export default function AdminTeamPage() {
         .select('*')
         .order('order_index', { ascending: true });
 
-      if (error || !dbData || dbData.length === 0) {
-        setData([
-          {
-            id: '1',
-            full_name: 'Abdulmumin Rabiu',
-            role_title: 'Executive Director & Founder',
-            bio: 'Abdulmumin is a dynamic community development leader with extensive expertise in project management, strategic program leadership, and community engagement.',
-            avatar_url: '',
-            email: 'caph4dev35@gmail.com',
-            linkedin_url: '#',
-            is_active: true,
-            order_index: 1,
-          },
-          {
-            id: '2',
-            full_name: 'Khadija Lawal Aliyu',
-            role_title: 'Gender Thematic Lead',
-            bio: 'Providing leadership on gender equality, human rights, and social inclusion programming.',
-            avatar_url: '',
-            email: 'caph4dev35@gmail.com',
-            linkedin_url: '#',
-            is_active: true,
-            order_index: 2,
-          },
-          {
-            id: '3',
-            full_name: 'Fatima Muftau',
-            role_title: 'Monitoring & Evaluation (M&E) Lead',
-            bio: 'Fatima Muftau is a dedicated Monitoring & Evaluation professional with expertise in data collection, analysis, and program assessment.',
-            avatar_url: '',
-            email: 'caph4dev35@gmail.com',
-            linkedin_url: '#',
-            is_active: true,
-            order_index: 3,
-          },
-          {
-            id: '4',
-            full_name: 'Muhammed Sani Kabir',
-            role_title: 'Communications Lead',
-            bio: 'Muhammed Sani Kabir is a creative and impact-driven Communications Lead with expertise in digital advocacy and strategic messaging.',
-            avatar_url: '',
-            email: 'caph4dev35@gmail.com',
-            linkedin_url: '#',
-            is_active: true,
-            order_index: 4,
-          },
-          {
-            id: '5',
-            full_name: 'Zakiyya Said Abdulkadir',
-            role_title: 'Health Thematic Lead',
-            bio: 'Providing technical leadership for community and primary healthcare programs, including adolescent and youth health interventions.',
-            avatar_url: '',
-            email: 'caph4dev35@gmail.com',
-            linkedin_url: '#',
-            is_active: true,
-            order_index: 5,
-          },
-        ]);
-      } else {
-        setData(dbData as TeamRecord[]);
+      if (!error && dbData && dbData.length > 0) {
+        currentList = dbData as TeamRecord[];
       }
     } catch {
       // Fallback
     } finally {
+      setData(currentList);
       setLoading(false);
     }
   };

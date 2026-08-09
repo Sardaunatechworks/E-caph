@@ -77,66 +77,8 @@ export default function AdminBoardPage() {
 
   const fetchBoardMembers = async () => {
     setLoading(true);
-    const defaultList: BoardMember[] = [
-      {
-        id: '1',
-        full_name: 'Dr. Hauwa Mustapha',
-        board_role: 'Chairman, Board of Trustees',
-        bio: 'Renowned public health strategist and governance advisor.',
-        avatar_url: '',
-        email: 'info@e-caph.org',
-        linkedin_url: '#',
-        twitter_url: '#',
-        order_index: 1,
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      {
-        id: '2',
-        full_name: 'Barr. Usman Danjuma',
-        board_role: 'Board Trustee & Legal Counsel',
-        bio: 'Human rights lawyer and legal reform advocate.',
-        avatar_url: '',
-        email: 'info@e-caph.org',
-        linkedin_url: '#',
-        twitter_url: '#',
-        order_index: 2,
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      {
-        id: '3',
-        full_name: 'Prof. Aliyu Bawa',
-        board_role: 'Trustee - Health Research & Evaluation',
-        bio: 'Professor of Community Medicine and Epidemiology.',
-        avatar_url: '',
-        email: 'info@e-caph.org',
-        linkedin_url: '#',
-        twitter_url: '#',
-        order_index: 3,
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      {
-        id: '4',
-        full_name: 'Hajiya Amina Bello',
-        board_role: 'Trustee - Gender & Peace Cohesion',
-        bio: 'Grassroots peace mediator and women advocate.',
-        avatar_url: '',
-        email: 'info@e-caph.org',
-        linkedin_url: '#',
-        twitter_url: '#',
-        order_index: 4,
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    ];
+    let currentList: BoardMember[] = [];
 
-    let currentList = defaultList;
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_board_members');
       if (saved) {

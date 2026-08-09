@@ -18,64 +18,6 @@ export const metadata: Metadata = {
   description: `Meet the leadership and passionate team behind ${siteConfig.fullName}.`,
 };
 
-const defaultTeamMembers = [
-  {
-    id: '1',
-    full_name: 'Abdulmumin Rabiu',
-    role_title: 'Executive Director & Founder',
-    bio: 'Abdulmumin is a dynamic community development leader with extensive expertise in project management, strategic program leadership, and community engagement. With over five years of experience driving social impact across northern Nigeria, he has successfully designed, implemented, and scaled initiatives that empower adolescents, youth, and local communities to improve health, education, and livelihoods.',
-    avatar_url: null,
-    email: 'caph4dev35@gmail.com',
-    linkedin_url: '#',
-    order_index: 1,
-    is_active: true,
-  },
-  {
-    id: '2',
-    full_name: 'Khadija Lawal Aliyu',
-    role_title: 'Gender Thematic Lead',
-    bio: 'Providing leadership on gender equality, human rights, and social inclusion programming. She holds a BSc in Biochemistry (First Class) from Federal University Gashua and has strong experience in research, advocacy, and community engagement.',
-    avatar_url: null,
-    email: 'caph4dev35@gmail.com',
-    linkedin_url: '#',
-    order_index: 2,
-    is_active: true,
-  },
-  {
-    id: '3',
-    full_name: 'Fatima Muftau',
-    role_title: 'Monitoring & Evaluation (M&E) Lead',
-    bio: 'Fatima Muftau is a dedicated Monitoring & Evaluation professional with expertise in data collection, analysis, and program assessment to support evidence-based decision-making. She holds an HND in PsychoSocial Rehabilitation Science.',
-    avatar_url: null,
-    email: 'caph4dev35@gmail.com',
-    linkedin_url: '#',
-    order_index: 3,
-    is_active: true,
-  },
-  {
-    id: '4',
-    full_name: 'Muhammed Sani Kabir',
-    role_title: 'Communications Lead',
-    bio: 'Muhammed Sani Kabir is a creative and impact-driven Communications Lead with expertise in digital advocacy, strategic messaging, and multimedia content production. He specializes in leveraging ICT4D tools to bridge data, storytelling, and social impact.',
-    avatar_url: null,
-    email: 'caph4dev35@gmail.com',
-    linkedin_url: '#',
-    order_index: 4,
-    is_active: true,
-  },
-  {
-    id: '5',
-    full_name: 'Zakiyya Said Abdulkadir',
-    role_title: 'Health Thematic Lead',
-    bio: 'Providing technical leadership for community and primary healthcare programs, including adolescent and youth health interventions. She holds a Higher National Diploma and National Diploma in Community Health from Shehu Idris College of Health Science and Technology, Makarfi.',
-    avatar_url: null,
-    email: 'caph4dev35@gmail.com',
-    linkedin_url: '#',
-    order_index: 5,
-    is_active: true,
-  },
-];
-
 const accentColors = [
   'bg-[#E67817]', // Vibrant Orange accent
   'bg-[#86C127]', // Lime Green accent
@@ -98,7 +40,7 @@ export default async function TeamPage() {
     // Crash-proof fallback for Vercel deployment
   }
 
-  const teamMembers = dbMembers || defaultTeamMembers;
+  const teamMembers = dbMembers || [];
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7FAF8] text-[#1E293B] font-sans">

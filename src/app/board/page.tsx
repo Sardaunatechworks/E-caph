@@ -8,65 +8,6 @@ import { siteConfig } from '@/config/site';
 import { createClient } from '@/lib/supabase/client';
 import type { BoardMember } from '@/types/database';
 
-const defaultBoardMembers: BoardMember[] = [
-  {
-    id: '1',
-    full_name: 'Dr. Hauwa Mustapha',
-    board_role: 'Chairman, Board of Trustees',
-    bio: null,
-    avatar_url: null,
-    email: null,
-    linkedin_url: null,
-    twitter_url: null,
-    order_index: 1,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    full_name: 'Barr. Usman Danjuma',
-    board_role: 'Board Trustee & Legal Counsel',
-    bio: null,
-    avatar_url: null,
-    email: null,
-    linkedin_url: null,
-    twitter_url: null,
-    order_index: 2,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    full_name: 'Prof. Aliyu Bawa',
-    board_role: 'Trustee - Health Research & Evaluation',
-    bio: null,
-    avatar_url: null,
-    email: null,
-    linkedin_url: null,
-    twitter_url: null,
-    order_index: 3,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '4',
-    full_name: 'Hajiya Amina Bello',
-    board_role: 'Trustee - Gender & Peace Cohesion',
-    bio: null,
-    avatar_url: null,
-    email: null,
-    linkedin_url: null,
-    twitter_url: null,
-    order_index: 4,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
-
 const accentColors = [
   'bg-[#E67817]', // Vibrant Orange accent
   'bg-[#86C127]', // Lime Green accent
@@ -75,10 +16,10 @@ const accentColors = [
 ];
 
 export default function BoardPage() {
-  const [boardMembers, setBoardMembers] = useState<BoardMember[]>(defaultBoardMembers);
+  const [boardMembers, setBoardMembers] = useState<BoardMember[]>([]);
 
   const loadData = async () => {
-    let currentList = defaultBoardMembers;
+    let currentList: BoardMember[] = [];
 
     // 1. Check local storage
     if (typeof window !== 'undefined') {
@@ -86,7 +27,7 @@ export default function BoardPage() {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
+          if (Array.isArray(parsed)) {
             currentList = parsed.filter((m: BoardMember) => m.is_active !== false);
           }
         } catch {}

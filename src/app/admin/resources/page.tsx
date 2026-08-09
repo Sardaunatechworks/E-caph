@@ -86,40 +86,8 @@ export default function AdminResourcesPage() {
 
   const fetchResources = async () => {
     setLoading(true);
-    const defaultList: DownloadResource[] = [
-      {
-        id: '1',
-        title: 'e-CAPH Annual Impact Report 2025-2026',
-        slug: 'e-caph-annual-impact-report-2025-2026',
-        description: 'Comprehensive annual report highlighting key achievements across adolescent health and peacebuilding.',
-        category: 'Annual Report',
-        file_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
-        file_size: '3.2 MB',
-        file_type: 'application/pdf',
-        downloads_count: 142,
-        is_published: true,
-        published_date: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      {
-        id: '2',
-        title: 'Policy Brief: Digital ANC Tracking & Primary Healthcare Delivery in Kaduna',
-        slug: 'policy-brief-digital-anc-tracking-kaduna',
-        description: 'Evidence-based policy brief examining the impact of digital tracking tools.',
-        category: 'Policy Brief',
-        file_url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
-        file_size: '1.8 MB',
-        file_type: 'application/pdf',
-        downloads_count: 89,
-        is_published: true,
-        published_date: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    ];
+    let currentList: DownloadResource[] = [];
 
-    let currentList = defaultList;
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_download_resources');
       if (saved) {

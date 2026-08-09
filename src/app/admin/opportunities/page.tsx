@@ -38,28 +38,8 @@ export default function AdminOpportunitiesPage() {
 
   const fetchOpportunities = async () => {
     setLoading(true);
-    const defaultList: OpportunityRecord[] = [
-      {
-        id: '1',
-        title: 'Youth Health Advocate Fellowship 2026',
-        opportunity_type: 'fellowship',
-        location: 'Kaduna, Nigeria',
-        deadline: '2026-09-30',
-        is_open: true,
-        application_link: 'https://e-caph.org/apply',
-      },
-      {
-        id: '2',
-        title: 'Community Outreach Volunteer Officer',
-        opportunity_type: 'volunteer',
-        location: 'Kano, Nigeria',
-        deadline: '2026-10-15',
-        is_open: true,
-        application_link: 'https://e-caph.org/apply',
-      },
-    ];
+    let currentList: OpportunityRecord[] = [];
 
-    let currentList = defaultList;
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_opportunities');
       if (saved) {

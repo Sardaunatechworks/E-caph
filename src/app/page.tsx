@@ -15,119 +15,6 @@ import type { TeamMember, Post, Project, Programme, ImpactStatistic } from '@/ty
 export const revalidate = 0;
 export const dynamic = 'force-dynamic';
 
-const defaultTeamMembers: TeamMember[] = [
-  {
-    id: '1',
-    full_name: 'Abdulmumin Rabiu',
-    role_title: 'Executive Director & Founder',
-    bio: 'Abdulmumin is a dynamic community development leader with extensive expertise in project management and strategic leadership.',
-    avatar_url: null,
-    email: 'caph4dev35@gmail.com',
-    linkedin_url: '#',
-    twitter_url: '#',
-    order_index: 1,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    full_name: 'Khadija Lawal Aliyu',
-    role_title: 'Gender Thematic Lead',
-    bio: 'Providing leadership on gender equality, human rights, and social inclusion programming.',
-    avatar_url: null,
-    email: 'caph4dev35@gmail.com',
-    linkedin_url: '#',
-    twitter_url: '#',
-    order_index: 2,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    full_name: 'Fatima Muftau',
-    role_title: 'Monitoring & Evaluation Lead',
-    bio: 'Dedicated Monitoring & Evaluation professional with expertise in data collection and real-time reporting.',
-    avatar_url: null,
-    email: 'caph4dev35@gmail.com',
-    linkedin_url: '#',
-    twitter_url: '#',
-    order_index: 3,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '4',
-    full_name: 'Muhammed Sani Kabir',
-    role_title: 'Communications Lead',
-    bio: 'Creative Communications Lead with expertise in digital advocacy, ICT4D, and storytelling.',
-    avatar_url: null,
-    email: 'caph4dev35@gmail.com',
-    linkedin_url: '#',
-    twitter_url: '#',
-    order_index: 4,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
-
-const defaultPosts: Post[] = [
-  {
-    id: '1',
-    author_id: null,
-    category_id: null,
-    programme_id: null,
-    project_id: null,
-    title: 'Community-Led ANC Tracking Improves Maternal Healthcare Attendance in Kaduna',
-    slug: 'community-led-anc-tracking-maternal-health',
-    summary: 'Through the e-CAPH ANC Tracker initiative, community health champions registered and monitored over 1,200 pregnant women across rural LGAs, increasing 4th-visit ANC attendance by 38%.',
-    content: 'Full report on maternal health tracking, community engagement, and digital data collection.',
-    featured_image: null,
-    post_type: 'report',
-    status: 'published',
-    published_at: new Date().toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '2',
-    author_id: null,
-    category_id: null,
-    programme_id: null,
-    project_id: null,
-    title: 'Empowering Youth Advocates for Peace and Social Cohesion in Northern Nigeria',
-    slug: 'empowering-youth-advocates-peacebuilding',
-    summary: 'Over 150 young peace ambassadors completed conflict resolution and dialogue training, facilitating community peace forums across local councils.',
-    content: 'Detailed insight into e-CAPH youth leadership forums, inter-faith dialogues, and civic conflict mediation.',
-    featured_image: null,
-    post_type: 'news',
-    status: 'published',
-    published_at: new Date().toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    author_id: null,
-    category_id: null,
-    programme_id: null,
-    project_id: null,
-    title: 'Strengthening Primary Healthcare Accountability Through Civic Monitoring',
-    slug: 'strengthening-primary-healthcare-accountability',
-    summary: 'Youth monitors track drug availability, facility infrastructure, and health worker attendance, presenting scorecard findings to local government health committees.',
-    content: 'Comprehensive analysis of Gani da Ido primary healthcare scorecard results.',
-    featured_image: null,
-    post_type: 'impact_story',
-    status: 'published',
-    published_at: new Date().toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
-
 export default async function HomePage() {
   let programmes: Programme[] = [];
   let projects: Project[] = [];
@@ -149,14 +36,10 @@ export default async function HomePage() {
     programmes = (resProg.data as Programme[] | null) || [];
     projects = (resProj.data as Project[] | null) || [];
     stats = (resStat.data as ImpactStatistic[] | null) || [];
-    const fetchedPosts = (resPost.data as Post[] | null) || [];
-    const fetchedTeam = (resTeam.data as TeamMember[] | null) || [];
-
-    posts = fetchedPosts.length > 0 ? fetchedPosts : defaultPosts;
-    teamMembers = fetchedTeam.length > 0 ? fetchedTeam : defaultTeamMembers;
+    posts = (resPost.data as Post[] | null) || [];
+    teamMembers = (resTeam.data as TeamMember[] | null) || [];
   } catch {
-    posts = defaultPosts;
-    teamMembers = defaultTeamMembers;
+    // Crash-proof fallback for Vercel deployment
   }
 
   return (
