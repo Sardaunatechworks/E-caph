@@ -537,18 +537,48 @@ export default async function HomePage() {
           </div>
 
           {teamMembers.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {teamMembers.map((member) => (
-                <div key={member.id} className="rounded-[10px] border border-[#E2E8F0] bg-white p-5 brand-shadow card-hover-lift space-y-3">
-                  <div className="w-14 h-14 rounded-[6px] bg-[#0092DF] text-white flex items-center justify-center font-bold text-lg shadow-sm">
-                    {member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+              {teamMembers.map((member, idx) => {
+                const initials = member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2);
+                const accentColors = ['bg-[#E67817]', 'bg-[#86C127]', 'bg-[#0092DF]', 'bg-[#E67817]'];
+                const accent = accentColors[idx % accentColors.length];
+
+                return (
+                  <div key={member.id} className="flex flex-col items-center text-center space-y-6 group">
+                    {/* Photo Card with Offset Accent Background */}
+                    <div className="relative w-full max-w-[260px]">
+                      <div
+                        className={`absolute inset-0 translate-x-3 translate-y-3 rounded-[20px] ${accent} transition-transform duration-300 group-hover:translate-x-4 group-hover:translate-y-4`}
+                      />
+                      <div className="relative aspect-square w-full rounded-[20px] bg-[#D1D5DB] overflow-hidden border border-slate-200/80 shadow-sm">
+                        {member.avatar_url ? (
+                          <img
+                            src={member.avatar_url}
+                            alt={member.full_name}
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-[#CBD5E1]">
+                            <div className="w-16 h-16 rounded-full bg-[#0092DF] text-white flex items-center justify-center text-xl font-black shadow-md">
+                              {initials}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Member Name and Position Only */}
+                    <div className="space-y-1 pt-1">
+                      <h3 className="text-base font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
+                        {member.full_name}
+                      </h3>
+                      <p className="text-xs text-[#64748B] font-semibold tracking-wide">
+                        {member.role_title}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="font-bold text-[#1E293B] text-base">{member.full_name}</h4>
-                    <p className="text-xs text-[#86C127] font-semibold">{member.role_title}</p>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="p-8 rounded-[10px] bg-white border border-[#E2E8F0] text-center space-y-2">

@@ -76,6 +76,13 @@ const defaultTeamMembers = [
   },
 ];
 
+const accentColors = [
+  'bg-[#E67817]', // Vibrant Orange accent
+  'bg-[#86C127]', // Lime Green accent
+  'bg-[#0092DF]', // Cyan/Blue accent
+  'bg-[#E67817]', // Orange accent
+];
+
 export default async function TeamPage() {
   let dbMembers: TeamMember[] | null = null;
 
@@ -88,12 +95,10 @@ export default async function TeamPage() {
       .order('order_index', { ascending: true });
     dbMembers = data as TeamMember[] | null;
   } catch {
-    // Graceful fallback for Vercel deployment
+    // Crash-proof fallback for Vercel deployment
   }
 
-  const teamMembers = (dbMembers && dbMembers.length > 0)
-    ? dbMembers
-    : (defaultTeamMembers as unknown as TeamMember[]);
+  const teamMembers = dbMembers || defaultTeamMembers;
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7FAF8] text-[#1E293B] font-sans">
@@ -107,95 +112,56 @@ export default async function TeamPage() {
 
       {/* Leadership & Staff Roster Section */}
       <section className="py-20 bg-white border-b border-[#E2E8F0]">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <Badge variant="secondary">Organizational Leadership</Badge>
+            <span className="text-xs font-bold text-[#86C127] uppercase tracking-widest block">
+              Organizational Staff
+            </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0092DF]">
-              Driven by Youth Leadership &amp; Community Passion
+              Meet Our Team
             </h2>
-            <p className="text-[#64748B] text-sm leading-relaxed">
-              Our team brings together expertise in public health, maternal care, human rights, civic governance, and youth advocacy across Nigeria.
-            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {teamMembers.map((member) => {
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 sm:gap-10">
+            {teamMembers.map((member, idx) => {
               const initials = member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2);
+              const accent = accentColors[idx % accentColors.length];
 
               return (
-                <div
-                  key={member.id}
-                  className="group rounded-[10px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-white overflow-hidden brand-shadow hover:brand-shadow-lg transition-all duration-150 flex flex-col justify-between"
-                >
-                  {/* Rectangular Profile Picture Container */}
-                  <div className="relative aspect-[4/3] bg-gradient-to-br from-[#003D60] to-[#007DC2] overflow-hidden flex items-center justify-center">
-                    {member.avatar_url ? (
-                      <img
-                        src={member.avatar_url}
-                        alt={member.full_name}
-                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                      />
-                    ) : (
-                      <div className="flex flex-col items-center justify-center text-center p-4">
-                        <div className="w-16 h-16 rounded-[8px] bg-[#86C127] text-white flex items-center justify-center text-2xl font-black shadow-md mb-2">
-                          {initials}
+                <div key={member.id} className="flex flex-col items-center text-center space-y-6 group">
+                  {/* Photo Card with Offset Accent Background */}
+                  <div className="relative w-full max-w-[280px]">
+                    {/* Offset Accent Block */}
+                    <div
+                      className={`absolute inset-0 translate-x-3 translate-y-3 rounded-[20px] ${accent} transition-transform duration-300 group-hover:translate-x-4 group-hover:translate-y-4`}
+                    />
+
+                    {/* Main Image Container */}
+                    <div className="relative aspect-square w-full rounded-[20px] bg-[#D1D5DB] overflow-hidden border border-slate-200/80 shadow-sm">
+                      {member.avatar_url ? (
+                        <img
+                          src={member.avatar_url}
+                          alt={member.full_name}
+                          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-[#CBD5E1]">
+                          <div className="w-20 h-20 rounded-full bg-[#0092DF] text-white flex items-center justify-center text-2xl font-black shadow-md">
+                            {initials}
+                          </div>
                         </div>
-                        <span className="text-[10px] text-slate-200 uppercase font-bold tracking-wider">
-                          e-CAPH Officer
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Card Content */}
-                  <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <Badge variant="outline" className="text-[10px] font-bold uppercase text-[#86C127] border-[#86C127]/30">
-                          Staff Member
-                        </Badge>
-                      </div>
-
-                      <h3 className="text-xl font-bold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
-                        {member.full_name}
-                      </h3>
-
-                      <p className="text-xs text-[#86C127] font-bold uppercase tracking-wider">
-                        {member.role_title}
-                      </p>
-
-                      {member.bio && (
-                        <p className="text-xs text-[#64748B] leading-relaxed pt-1 line-clamp-3">
-                          {member.bio}
-                        </p>
                       )}
                     </div>
+                  </div>
 
-                    <div className="pt-4 border-t border-[#E2E8F0] flex items-center justify-between">
-                      <span className="text-[11px] text-[#94A3B8] font-semibold">Kaduna, Nigeria</span>
-                      <div className="flex gap-3">
-                        {member.email && (
-                          <a
-                            href={`mailto:${member.email}`}
-                            className="text-[#94A3B8] hover:text-[#E67817] transition-colors"
-                            title="Send Email"
-                          >
-                            <Mail className="w-4 h-4" />
-                          </a>
-                        )}
-                        {member.linkedin_url && (
-                          <a
-                            href={member.linkedin_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#94A3B8] hover:text-[#E67817] transition-colors"
-                            title="LinkedIn Profile"
-                          >
-                            <Linkedin className="w-4 h-4" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
+                  {/* Member Name and Position Only */}
+                  <div className="space-y-1 pt-2">
+                    <h3 className="text-lg font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
+                      {member.full_name}
+                    </h3>
+                    <p className="text-xs text-[#64748B] font-semibold tracking-wide">
+                      {member.role_title}
+                    </p>
                   </div>
                 </div>
               );

@@ -159,3 +159,34 @@ export interface ImpactStatistic {
   is_published: boolean;
   updated_at?: string;
 }
+
+export interface BoardMember {
+  id: string;
+  full_name: string;
+  board_role: string;
+  bio: string | null;
+  avatar_url: string | null;
+  email: string | null;
+  linkedin_url: string | null;
+  twitter_url: string | null;
+  order_index: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DownloadResource {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  category: 'Annual Report' | 'Policy Brief' | 'Research Paper' | 'Tool/Guide' | 'Financial Report' | string;
+  file_url: string;
+  file_size: string | null;
+  file_type: string;
+  downloads_count: number;
+  is_published: boolean;
+  published_date: string | null;
+  created_at: string;
+  updated_at: string;
+}

@@ -82,6 +82,12 @@ export function Header() {
                   >
                     Meet Our Team
                   </Link>
+                  <Link
+                    href="/board"
+                    className="block px-4 py-2 text-xs font-semibold text-[#1E293B] hover:bg-[#F7FAF8] hover:text-[#0092DF] transition-colors"
+                  >
+                    Board Members
+                  </Link>
                 </div>
               )}
             </div>
@@ -98,6 +104,20 @@ export function Header() {
               className="hover:text-[#E67817] hover:border-b-2 hover:border-[#E67817] transition-all py-2"
             >
               Projects
+            </Link>
+
+            <Link
+              href="/blog"
+              className="hover:text-[#E67817] hover:border-b-2 hover:border-[#E67817] transition-all py-2"
+            >
+              Blog
+            </Link>
+
+            <Link
+              href="/resources"
+              className="hover:text-[#E67817] hover:border-b-2 hover:border-[#E67817] transition-all py-2"
+            >
+              Resources &amp; PDFs
             </Link>
 
             {/* Media Dropdown */}
@@ -176,6 +196,9 @@ export function Header() {
               <Link href="/team" onClick={() => setMobileOpen(false)} className="block py-1 text-[#0092DF] font-bold">
                 Meet Our Team
               </Link>
+              <Link href="/board" onClick={() => setMobileOpen(false)} className="block py-1 hover:text-[#E67817]">
+                Board Members
+              </Link>
             </div>
 
             <Link href="/programmes" onClick={() => setMobileOpen(false)} className="py-1.5 hover:text-[#E67817]">
@@ -183,6 +206,12 @@ export function Header() {
             </Link>
             <Link href="/projects" onClick={() => setMobileOpen(false)} className="py-1.5 hover:text-[#E67817]">
               Projects
+            </Link>
+            <Link href="/blog" onClick={() => setMobileOpen(false)} className="py-1.5 hover:text-[#E67817]">
+              Blog
+            </Link>
+            <Link href="/resources" onClick={() => setMobileOpen(false)} className="py-1.5 hover:text-[#E67817]">
+              Resources &amp; PDFs
             </Link>
             <Link href="/stories" onClick={() => setMobileOpen(false)} className="py-1.5 hover:text-[#E67817]">
               Stories &amp; News
