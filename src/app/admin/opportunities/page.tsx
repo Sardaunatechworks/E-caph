@@ -156,22 +156,29 @@ export default function AdminOpportunitiesPage() {
     e.preventDefault();
     const supabase = createClient();
 
+    const slug = formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString().slice(-4);
+    const payload = { ...formData, slug };
+    let updated: OpportunityRecord[] = [];
+
     if (editingRow) {
+      updated = data.map((d) => (d.id === editingRow.id ? { ...d, ...formData } : d));
       try {
-        await supabase.from('opportunities').update(formData).eq('id', editingRow.id);
+        await supabase.from('opportunities').update(payload).eq('id', editingRow.id);
       } catch {}
-      setData(data.map((d) => (d.id === editingRow.id ? { ...d, ...formData } : d)));
     } else {
+      const newItem: OpportunityRecord = { id: String(Date.now()), ...formData };
+      updated = [newItem, ...data];
       try {
-        const { data: inserted } = await supabase.from('opportunities').insert(formData).select();
+        const { data: inserted } = await supabase.from('opportunities').insert(payload).select();
         if (inserted && inserted[0]) {
-          setData([inserted[0] as OpportunityRecord, ...data]);
-        } else {
-          setData([{ id: String(Date.now()), ...formData }, ...data]);
+          updated = [inserted[0] as OpportunityRecord, ...data];
         }
-      } catch {
-        setData([{ id: String(Date.now()), ...formData }, ...data]);
-      }
+      } catch {}
+    }
+
+    setData(updated);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('ecaph_opportunities', JSON.stringify(updated));
     }
     setIsModalOpen(false);
   };

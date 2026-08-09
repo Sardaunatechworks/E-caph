@@ -255,14 +255,17 @@ export default function AdminResourcesPage() {
     e.preventDefault();
     const supabase = createClient();
 
-    const slug = formData.slug || formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const baseSlug = formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'document';
+    const slug = editingRow
+      ? (formData.slug || baseSlug)
+      : `${baseSlug}-${Date.now().toString().slice(-4)}`;
     const payload = { ...formData, slug };
     let updated: DownloadResource[] = [];
 
     if (editingRow) {
       updated = data.map((d) => (d.id === editingRow.id ? ({ ...d, ...payload } as DownloadResource) : d));
       try {
-        await supabase.from('download_resources').update(payload).eq('id', editingRow.id);
+        await supabase.from('download_resources').upsert(payload, { onConflict: 'id' });
       } catch {}
     } else {
       const newItem: DownloadResource = {
@@ -273,7 +276,7 @@ export default function AdminResourcesPage() {
       };
       updated = [newItem, ...data];
       try {
-        const { data: inserted } = await supabase.from('download_resources').insert(payload).select();
+        const { data: inserted } = await supabase.from('download_resources').upsert(payload, { onConflict: 'slug' }).select();
         if (inserted && inserted[0]) {
           updated = [inserted[0] as DownloadResource, ...data];
         }
