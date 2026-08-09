@@ -97,7 +97,7 @@ export default async function BlogPage() {
             <h3 className="text-2xl font-extrabold text-[#0092DF]">Recent Publications &amp; Articles</h3>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {(remainingPosts.length > 0 ? remainingPosts : defaultBlogPosts).map((post) => (
+              {remainingPosts.map((post) => (
                 <article
                   key={post.id}
                   className="rounded-[10px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-white p-6 brand-shadow hover:brand-shadow-lg transition-all duration-200 flex flex-col justify-between space-y-4"
