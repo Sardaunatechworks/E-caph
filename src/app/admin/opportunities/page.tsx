@@ -38,6 +38,35 @@ export default function AdminOpportunitiesPage() {
 
   const fetchOpportunities = async () => {
     setLoading(true);
+    const defaultList: OpportunityRecord[] = [
+      {
+        id: '1',
+        title: 'Youth Health Advocate Fellowship 2026',
+        opportunity_type: 'fellowship',
+        location: 'Kaduna, Nigeria',
+        deadline: '2026-09-30',
+        is_open: true,
+        application_link: 'https://e-caph.org/apply',
+      },
+      {
+        id: '2',
+        title: 'Community Outreach Volunteer Officer',
+        opportunity_type: 'volunteer',
+        location: 'Kano, Nigeria',
+        deadline: '2026-10-15',
+        is_open: true,
+        application_link: 'https://e-caph.org/apply',
+      },
+    ];
+
+    let currentList = defaultList;
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ecaph_opportunities');
+      if (saved) {
+        try { currentList = JSON.parse(saved); } catch {}
+      }
+    }
+
     try {
       const supabase = createClient();
       const { data: dbData, error } = await supabase
@@ -45,33 +74,13 @@ export default function AdminOpportunitiesPage() {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error || !dbData || dbData.length === 0) {
-        setData([
-          {
-            id: '1',
-            title: 'Youth Health Advocate Fellowship 2026',
-            opportunity_type: 'fellowship',
-            location: 'Kaduna, Nigeria',
-            deadline: '2026-09-30',
-            is_open: true,
-            application_link: 'https://e-caph.org/apply',
-          },
-          {
-            id: '2',
-            title: 'Community Outreach Volunteer Officer',
-            opportunity_type: 'volunteer',
-            location: 'Kano, Nigeria',
-            deadline: '2026-10-15',
-            is_open: true,
-            application_link: 'https://e-caph.org/apply',
-          },
-        ]);
-      } else {
-        setData(dbData as OpportunityRecord[]);
+      if (!error && dbData && dbData.length > 0) {
+        currentList = dbData as OpportunityRecord[];
       }
     } catch {
       // Fallback
     } finally {
+      setData(currentList);
       setLoading(false);
     }
   };
