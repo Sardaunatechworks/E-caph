@@ -54,11 +54,10 @@ export default function AdminLogoPage() {
       const { data, error } = await supabase
         .from('site_settings')
         .select('*')
-        .eq('key', 'site_logo')
-        .single();
+        .eq('key', 'site_logo');
 
-      if (!error && data?.value) {
-        current = { ...defaultLogoConfig, ...data.value };
+      if (!error && data && data[0]?.value) {
+        current = { ...defaultLogoConfig, ...data[0].value };
       }
     } catch {}
 
