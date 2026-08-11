@@ -7,44 +7,45 @@ interface LogoProps {
 }
 
 export function Logo({ variant = 'default', className = '', showText = true }: LogoProps) {
-  const textColor = variant === 'white' ? 'text-white' : 'text-[#0090DF]';
-  const subTextColor = variant === 'white' ? 'text-emerald-200' : 'text-[#333333]';
+  const isWhite = variant === 'white';
+  const textColor = isWhite ? 'text-white' : 'text-[#0092DF]';
+  const rcTextColor = isWhite ? 'text-[#38BDF8]' : 'text-[#0092DF]';
 
   return (
-    <Link href="/" className={`inline-flex items-center gap-3 group ${className}`}>
-      {/* Official e-CAPH Mark: 3 Embracing Figures */}
+    <Link href="/" className={`inline-flex items-center gap-3.5 group ${className}`}>
+      {/* Official e-CAPH Mark: 3 Interlocking Embracing Figures */}
       <svg
-        viewBox="0 0 120 120"
-        className="w-10 h-10 shrink-0 transition-transform group-hover:scale-105"
+        viewBox="0 0 400 400"
+        className="w-10 h-10 shrink-0 transition-transform duration-200 group-hover:scale-105"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Top-Right Figure (Green) */}
-        <circle cx="76" cy="22" r="13" fill="#84C225" />
+        {/* Top-Right Green Figure */}
+        <circle cx="260" cy="80" r="45" fill="#86C127" />
         <path
-          d="M 44 20 C 65 10, 88 12, 96 28 C 104 46, 94 76, 74 96 C 68 102, 60 106, 56 107 C 68 93, 83 72, 80 46 C 78 32, 66 25, 44 20 Z"
-          fill="#84C225"
+          d="M 160 85 C 220 40, 300 45, 330 100 C 360 160, 330 260, 250 330 C 230 348, 200 365, 185 370 C 230 320, 285 240, 275 150 C 270 105, 230 85, 160 85 Z"
+          fill="#86C127"
         />
 
-        {/* Left Figure (Orange) */}
-        <circle cx="38" cy="36" r="11" fill="#E87A1E" />
+        {/* Left Orange Figure */}
+        <circle cx="130" cy="130" r="38" fill="#E67817" />
         <path
-          d="M 32 46 C 24 64, 28 88, 48 104 C 54 108, 59 108, 59 108 C 45 105, 32 92, 26 76 C 20 60, 24 48, 32 46 Z"
-          fill="#E87A1E"
+          d="M 110 165 C 80 225, 95 305, 160 360 C 180 375, 200 375, 200 375 C 150 365, 110 320, 90 265 C 70 210, 85 170, 110 165 Z"
+          fill="#E67817"
         />
 
-        {/* Center Figure (Blue) */}
-        <circle cx="60" cy="46" r="9" fill="#0090DF" />
+        {/* Center Blue Figure */}
+        <circle cx="205" cy="165" r="32" fill="#0092DF" />
         <path
-          d="M 42 56 C 54 48, 70 48, 78 58 C 72 78, 64 96, 54 104 C 62 90, 68 72, 64 62 C 60 55, 50 54, 42 56 Z"
-          fill="#0090DF"
+          d="M 145 195 C 185 168, 240 168, 268 202 C 248 270, 220 330, 185 360 C 212 310, 232 250, 218 215 C 205 190, 170 188, 145 195 Z"
+          fill="#0092DF"
         />
       </svg>
 
-      {/* Brand Typography */}
+      {/* Official Typography: RC:144280 + e-CAPH */}
       {showText && variant !== 'compact' && (
-        <div className="flex flex-col relative">
-          <span className={`text-[9px] font-extrabold tracking-wider uppercase self-end mr-0.5 -mb-0.5 ${subTextColor}`}>
+        <div className="flex flex-col relative justify-center">
+          <span className={`text-[9px] font-extrabold tracking-wider uppercase self-end mr-0.5 -mb-0.5 ${rcTextColor}`}>
             RC:144280
           </span>
           <span className={`font-black text-2xl leading-none tracking-tight font-sans ${textColor}`}>
