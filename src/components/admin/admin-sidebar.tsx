@@ -11,6 +11,7 @@ import {
   Briefcase,
   Users,
   Award,
+  Image,
   FileDown,
   TrendingUp,
   Mail,
@@ -36,6 +37,7 @@ export function AdminSidebar({ unreadMessagesCount = 2, onCloseMobile }: Sidebar
     { label: 'Opportunities', href: '/admin/opportunities', icon: Briefcase },
     { label: 'Team Members', href: '/admin/team', icon: Users },
     { label: 'Board Members', href: '/admin/board', icon: Award },
+    { label: 'Logo & Branding', href: '/admin/logo', icon: Image },
     { label: 'Impact Stats', href: '/admin/impact', icon: TrendingUp },
     {
       label: 'Messages',

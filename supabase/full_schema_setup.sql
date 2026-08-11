@@ -124,8 +124,19 @@ CREATE TABLE IF NOT EXISTS public.posts (
 ALTER TABLE public.posts ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read posts" ON public.posts;
 CREATE POLICY "Public read posts" ON public.posts FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Admin write posts" ON public.posts;
-CREATE POLICY "Admin write posts" ON public.posts FOR ALL USING (true);
+-- 7. SITE SETTINGS TABLE (Branding & Logo Config)
+CREATE TABLE IF NOT EXISTS public.site_settings (
+  key TEXT PRIMARY KEY,
+  value JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read site_settings" ON public.site_settings;
+CREATE POLICY "Public read site_settings" ON public.site_settings FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Admin write site_settings" ON public.site_settings;
+CREATE POLICY "Admin write site_settings" ON public.site_settings FOR ALL USING (true);
 
 -- ============================================================================
 -- INITIAL SEED RECORDS
