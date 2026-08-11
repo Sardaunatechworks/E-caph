@@ -130,13 +130,17 @@ export default function AdminLogoPage() {
       window.dispatchEvent(new Event('ecaph_logo_updated'));
     }
 
-    // Save to Supabase site_settings
+    // Save to Supabase site_settings (if table exists)
     try {
       const supabase = createClient();
       await supabase.from('site_settings').upsert(
         { key: 'site_logo', value: updatedConfig, updated_at: new Date().toISOString() },
         { onConflict: 'key' }
-      );
+      ).then(({ error }) => {
+        if (error) {
+          // Table site_settings pending creation in Supabase SQL Editor
+        }
+      });
     } catch {}
 
     setSavedSuccess(true);
@@ -158,7 +162,7 @@ export default function AdminLogoPage() {
         supabase.from('site_settings').upsert(
           { key: 'site_logo', value: resetConfig, updated_at: new Date().toISOString() },
           { onConflict: 'key' }
-        );
+        ).then(() => {});
       } catch {}
 
       setSavedSuccess(true);
