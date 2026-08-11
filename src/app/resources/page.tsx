@@ -60,9 +60,12 @@ export default function ResourcesPage() {
     window.addEventListener('storage', handleSync);
     window.addEventListener('ecaph_resources_updated', handleSync);
 
+    const interval = setInterval(fetchResources, 10000);
+
     return () => {
       window.removeEventListener('storage', handleSync);
       window.removeEventListener('ecaph_resources_updated', handleSync);
+      clearInterval(interval);
     };
   }, []);
 

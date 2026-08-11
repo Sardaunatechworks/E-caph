@@ -54,9 +54,12 @@ export default function BlogPage() {
     window.addEventListener('storage', handleSync);
     window.addEventListener('ecaph_posts_updated', handleSync);
 
+    const interval = setInterval(fetchPosts, 10000);
+
     return () => {
       window.removeEventListener('storage', handleSync);
       window.removeEventListener('ecaph_posts_updated', handleSync);
+      clearInterval(interval);
     };
   }, []);
 

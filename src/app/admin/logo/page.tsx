@@ -293,6 +293,7 @@ export default function AdminLogoPage() {
               />
             </div>
 
+
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-[#1E293B]">Registration Number (RC) </label>
               <Input

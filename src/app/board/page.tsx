@@ -54,14 +54,17 @@ export default function BoardPage() {
   useEffect(() => {
     loadData();
 
-    // Real-time storage listener for multi-tab sync
+    // Real-time storage listener & 10s global multi-device polling
     const handleStorageChange = () => loadData();
     window.addEventListener('storage', handleStorageChange);
     window.addEventListener('ecaph_board_updated', handleStorageChange);
 
+    const interval = setInterval(loadData, 10000);
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('ecaph_board_updated', handleStorageChange);
+      clearInterval(interval);
     };
   }, []);
 

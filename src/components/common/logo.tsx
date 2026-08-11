@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 
 interface LogoProps {
   variant?: 'default' | 'white' | 'compact';
@@ -21,17 +22,37 @@ export function Logo({ variant = 'default', className = '', showText = true }: L
     registration_number: 'RC:144280',
   });
 
-  const loadConfig = () => {
+  const loadConfig = async () => {
+    let currentConfig = null;
+
+    // 1. Check local storage
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_site_logo');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           if (parsed && typeof parsed === 'object') {
-            setLogoConfig((prev) => ({ ...prev, ...parsed }));
+            currentConfig = parsed;
           }
         } catch {}
       }
+    }
+
+    // 2. Query Supabase Database for Global Device Sync
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('site_settings')
+        .select('*')
+        .eq('key', 'site_logo');
+
+      if (!error && data && data[0]?.value) {
+        currentConfig = data[0].value;
+      }
+    } catch {}
+
+    if (currentConfig) {
+      setLogoConfig((prev) => ({ ...prev, ...currentConfig }));
     }
   };
 
@@ -42,9 +63,13 @@ export function Logo({ variant = 'default', className = '', showText = true }: L
     window.addEventListener('storage', handleSync);
     window.addEventListener('ecaph_logo_updated', handleSync);
 
+    // Global 10s interval polling across devices
+    const interval = setInterval(loadConfig, 10000);
+
     return () => {
       window.removeEventListener('storage', handleSync);
       window.removeEventListener('ecaph_logo_updated', handleSync);
+      clearInterval(interval);
     };
   }, []);
 
