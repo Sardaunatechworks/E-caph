@@ -283,23 +283,23 @@ export default function AdminLogoPage() {
           {/* Brand Text Settings */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-[#E2E8F0]">
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#1E293B]">Brand Title Text *</label>
+              <label className="text-xs font-bold text-[#1E293B]">Brand Title Text </label>
               <Input
                 value={config.brand_title}
                 onChange={(e) => setConfig({ ...config, brand_title: e.target.value })}
                 placeholder="e-CAPH"
-                required
+                
                 className="bg-white border-[#E2E8F0] h-10 text-xs rounded-[6px]"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-bold text-[#1E293B]">Registration Number (RC) *</label>
+              <label className="text-xs font-bold text-[#1E293B]">Registration Number (RC) </label>
               <Input
                 value={config.registration_number}
                 onChange={(e) => setConfig({ ...config, registration_number: e.target.value })}
                 placeholder="RC:144280"
-                required
+              
                 className="bg-white border-[#E2E8F0] h-10 text-xs rounded-[6px]"
               />
             </div>
