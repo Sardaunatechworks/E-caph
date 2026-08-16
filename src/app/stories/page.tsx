@@ -8,9 +8,6 @@ import { createClient } from '@/lib/supabase/server';
 import { Calendar, BookOpen, ArrowRight } from 'lucide-react';
 import type { Post } from '@/types/database';
 
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   title: 'Stories & Publications',
   description: `Field updates, reports, research publications, and news from ${siteConfig.name}.`,

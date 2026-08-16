@@ -5,9 +5,6 @@ import { PageBanner } from '@/components/common/page-banner';
 import { siteConfig } from '@/config/site';
 import { Camera, Video, FileText } from 'lucide-react';
 
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
-
 export const metadata: Metadata = {
   title: 'Media & Gallery',
   description: `Photos, videos, and media resources from ${siteConfig.name}.`,

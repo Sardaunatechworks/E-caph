@@ -12,9 +12,6 @@ import { createClient } from '@/lib/supabase/server';
 import { ArrowRight, Award, Sparkles, BookOpen, Users, HeartPulse, ShieldCheck, TrendingUp } from 'lucide-react';
 import type { TeamMember, Post, Project, Programme, ImpactStatistic } from '@/types/database';
 
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
-
 export default async function HomePage() {
   let programmes: Programme[] = [];
   let projects: Project[] = [];

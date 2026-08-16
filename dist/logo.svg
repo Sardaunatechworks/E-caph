@@ -1,0 +1,14 @@
+<svg viewBox="0 0 400 400" width="400" height="400" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Official e-CAPH Mark: 3 Interlocking Figures -->
+  <!-- Top-Right Green Figure -->
+  <circle cx="260" cy="80" r="45" fill="#86C127" />
+  <path d="M 160 85 C 220 40, 300 45, 330 100 C 360 160, 330 260, 250 330 C 230 348, 200 365, 185 370 C 230 320, 285 240, 275 150 C 270 105, 230 85, 160 85 Z" fill="#86C127" />
+
+  <!-- Left Orange Figure -->
+  <circle cx="130" cy="130" r="38" fill="#E67817" />
+  <path d="M 110 165 C 80 225, 95 305, 160 360 C 180 375, 200 375, 200 375 C 150 365, 110 320, 90 265 C 70 210, 85 170, 110 165 Z" fill="#E67817" />
+
+  <!-- Center Blue Figure -->
+  <circle cx="205" cy="165" r="32" fill="#0092DF" />
+  <path d="M 145 195 C 185 168, 240 168, 268 202 C 248 270, 220 330, 185 360 C 212 310, 232 250, 218 215 C 205 190, 170 188, 145 195 Z" fill="#0092DF" />
+</svg>
