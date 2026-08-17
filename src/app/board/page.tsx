@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { PageBanner } from '@/components/common/page-banner';
-import { siteConfig } from '@/config/site';
 import { createClient } from '@/lib/supabase/client';
 import type { BoardMember } from '@/types/database';
 
@@ -15,11 +14,70 @@ const accentColors = [
   'bg-[#E67817]', // Orange accent
 ];
 
+const defaultBoardMembers: BoardMember[] = [
+  {
+    id: 'board-1',
+    full_name: 'Dr. Hauwa Mustapha',
+    board_role: 'Chairman, Board of Trustees',
+    bio: 'Renowned public health strategist and governance advisor.',
+    avatar_url: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80',
+    email: 'info@e-caph.org',
+    linkedin_url: null,
+    twitter_url: null,
+    order_index: 1,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'board-2',
+    full_name: 'Barr. Usman Danjuma',
+    board_role: 'Board Trustee & Legal Counsel',
+    bio: 'Human rights lawyer and legal reform advocate.',
+    avatar_url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=80',
+    email: 'info@e-caph.org',
+    linkedin_url: null,
+    twitter_url: null,
+    order_index: 2,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'board-3',
+    full_name: 'Prof. Aliyu Bawa',
+    board_role: 'Trustee - Health Research & Evaluation',
+    bio: 'Professor of Community Medicine and Epidemiology.',
+    avatar_url: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
+    email: 'info@e-caph.org',
+    linkedin_url: null,
+    twitter_url: null,
+    order_index: 3,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'board-4',
+    full_name: 'Hajiya Amina Bello',
+    board_role: 'Trustee - Gender & Peace Cohesion',
+    bio: 'Grassroots peace mediator and women advocate.',
+    avatar_url: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&q=80',
+    email: 'info@e-caph.org',
+    linkedin_url: null,
+    twitter_url: null,
+    order_index: 4,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+];
+
 export default function BoardPage() {
-  const [boardMembers, setBoardMembers] = useState<BoardMember[]>([]);
+  const [boardMembers, setBoardMembers] = useState<BoardMember[]>(defaultBoardMembers);
 
   const loadData = async () => {
-    let currentList: BoardMember[] = [];
+    let currentList = defaultBoardMembers;
 
     // 1. Check local storage
     if (typeof window !== 'undefined') {
@@ -27,7 +85,7 @@ export default function BoardPage() {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) {
+          if (Array.isArray(parsed) && parsed.length > 0) {
             currentList = parsed.filter((m: BoardMember) => m.is_active !== false);
           }
         } catch {}
@@ -132,7 +190,7 @@ export default function BoardPage() {
                     <h3 className="text-lg font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
                       {member.full_name}
                     </h3>
-                    <p className="text-xs text-[#64748B] font-semibold tracking-wide">
+                    <p className="text-xs font-bold text-[#E67817] uppercase tracking-wider">
                       {member.board_role}
                     </p>
                   </div>

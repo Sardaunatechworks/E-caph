@@ -1,19 +1,11 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
+'use client';
+
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { PageBanner } from '@/components/common/page-banner';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { siteConfig } from '@/config/site';
-import { createClient } from '@/lib/supabase/server';
-import { Mail, Linkedin, ArrowRight, HeartPulse, Users, ShieldCheck } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 import type { TeamMember } from '@/types/database';
-
-export const metadata: Metadata = {
-  title: 'Our Team',
-  description: `Meet the leadership and passionate team behind ${siteConfig.fullName}.`,
-};
 
 const accentColors = [
   'bg-[#E67817]', // Vibrant Orange accent
@@ -22,22 +14,116 @@ const accentColors = [
   'bg-[#E67817]', // Orange accent
 ];
 
-export default async function TeamPage() {
-  let dbMembers: TeamMember[] | null = null;
+const defaultTeamMembers: TeamMember[] = [
+  {
+    id: 'team-1',
+    full_name: 'Dr. Fatima Abubakar',
+    role_title: 'Executive Director & Founder',
+    bio: 'Public health physician with 15+ years leading health systems reform and community interventions in Nigeria.',
+    avatar_url: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80',
+    email: 'fatima@e-caph.org',
+    linkedin_url: null,
+    twitter_url: null,
+    order_index: 1,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'team-2',
+    full_name: 'Ibrahim Sani',
+    role_title: 'Director of Programmes',
+    bio: 'Development strategist overseeing adolescent health, civic accountability, and youth economic empowerment initiatives.',
+    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+    email: 'ibrahim@e-caph.org',
+    linkedin_url: null,
+    twitter_url: null,
+    order_index: 2,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'team-3',
+    full_name: 'Amina Kabir',
+    role_title: 'Head of Public Health & ANC',
+    bio: 'Epidemiologist leading maternal-newborn health tracking and primary health center community advocacy.',
+    avatar_url: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=600&q=80',
+    email: 'amina@e-caph.org',
+    linkedin_url: null,
+    twitter_url: null,
+    order_index: 3,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'team-4',
+    full_name: 'Yusuf Mohammed',
+    role_title: 'Lead, Gani da Ido & Civic Governance',
+    bio: 'Social accountability expert coordinating Youth Accountability Champions and community service monitoring.',
+    avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
+    email: 'yusuf@e-caph.org',
+    linkedin_url: null,
+    twitter_url: null,
+    order_index: 4,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+];
 
-  try {
-    const supabase = await createClient();
-    const { data } = await supabase
-      .from('team_members')
-      .select('*')
-      .eq('is_active', true)
-      .order('order_index', { ascending: true });
-    dbMembers = data as TeamMember[] | null;
-  } catch {
-    // Crash-proof fallback for Vercel deployment
-  }
+export default function TeamPage() {
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(defaultTeamMembers);
 
-  const teamMembers = dbMembers || [];
+  const fetchTeamMembers = async () => {
+    let currentList = defaultTeamMembers;
+
+    // 1. Check local storage
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ecaph_team_members');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            currentList = parsed.filter((m: TeamMember) => m.is_active !== false);
+          }
+        } catch {}
+      }
+    }
+
+    // 2. Query Supabase Client
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('team_members')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index', { ascending: true });
+
+      if (!error && data && data.length > 0) {
+        currentList = data as TeamMember[];
+      }
+    } catch {}
+
+    setTeamMembers(currentList);
+  };
+
+  useEffect(() => {
+    fetchTeamMembers();
+
+    const handleSync = () => fetchTeamMembers();
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('ecaph_team_updated', handleSync);
+
+    const interval = setInterval(fetchTeamMembers, 10000);
+
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('ecaph_team_updated', handleSync);
+      clearInterval(interval);
+    };
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7FAF8] text-[#1E293B] font-sans">
@@ -63,7 +149,12 @@ export default async function TeamPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 sm:gap-10">
             {teamMembers.map((member, idx) => {
-              const initials = member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2);
+              const initials = member.full_name
+                .split(' ')
+                .map((n) => n[0])
+                .join('')
+                .slice(0, 2);
+
               const accent = accentColors[idx % accentColors.length];
 
               return (
@@ -98,79 +189,13 @@ export default async function TeamPage() {
                     <h3 className="text-lg font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
                       {member.full_name}
                     </h3>
-                    <p className="text-xs text-[#64748B] font-semibold tracking-wide">
+                    <p className="text-xs font-bold text-[#E67817] uppercase tracking-wider">
                       {member.role_title}
                     </p>
                   </div>
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* Leadership Values */}
-      <section className="py-20 bg-[#F3F7F5] border-b border-[#E2E8F0]">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="text-center max-w-2xl mx-auto space-y-3">
-            <Badge variant="secondary">Leadership Principles</Badge>
-            <h2 className="text-3xl font-extrabold text-[#0092DF]">How We Work Together</h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="p-6 rounded-[10px] bg-white border border-[#E2E8F0] border-t-4 border-t-[#86C127] brand-shadow space-y-3">
-              <div className="w-10 h-10 rounded-[6px] bg-[#E6F4FC] text-[#0092DF] flex items-center justify-center">
-                <Users className="w-5 h-5" />
-              </div>
-              <h3 className="text-lg font-bold text-[#0092DF]">Youth Leadership</h3>
-              <p className="text-xs text-[#64748B] leading-relaxed">
-                Empowering young healthcare professionals and advocates to lead localized intervention programs.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-[10px] bg-white border border-[#E2E8F0] border-t-4 border-t-[#86C127] brand-shadow space-y-3">
-              <div className="w-10 h-10 rounded-[6px] bg-[#F3F9E9] text-[#86C127] flex items-center justify-center">
-                <HeartPulse className="w-5 h-5" />
-              </div>
-              <h3 className="text-lg font-bold text-[#0092DF]">Community Inclusion</h3>
-              <p className="text-xs text-[#64748B] leading-relaxed">
-                Co-designing initiatives alongside community leaders, women groups, and primary healthcare workers.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-[10px] bg-white border border-[#E2E8F0] border-t-4 border-t-[#86C127] brand-shadow space-y-3">
-              <div className="w-10 h-10 rounded-[6px] bg-[#FDF2E8] text-[#E67817] flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <h3 className="text-lg font-bold text-[#0092DF]">Evidence &amp; Rigor</h3>
-              <p className="text-xs text-[#64748B] leading-relaxed">
-                Applying research rigor, data protection, and transparent monitoring across all field interventions.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-20 bg-[#003D60] text-white text-center">
-        <div className="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
-            Interested in Partnering With Our Team?
-          </h2>
-          <p className="text-slate-200 text-base leading-relaxed max-w-2xl mx-auto">
-            We welcome strategic collaborations with international development partners, civil society organizations, and research institutions.
-          </p>
-          <div className="pt-4 flex flex-wrap justify-center gap-4">
-            <Link href="/contact?type=partnership">
-              <Button size="lg" className="bg-[#0092DF] hover:bg-[#007DC2] text-white font-extrabold shadow-md">
-                Partner With Us
-              </Button>
-            </Link>
-            <Link href="/opportunities">
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10 bg-transparent">
-                View Open Positions <ArrowRight className="ml-2 w-4 h-4 text-[#E67817]" />
-              </Button>
-            </Link>
           </div>
         </div>
       </section>

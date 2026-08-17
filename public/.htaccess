@@ -1,0 +1,26 @@
+# ============================================================================
+# e-CAPH System Apache Configuration (Optimized for Namecheap cPanel)
+# ============================================================================
+
+Options -MultiViews
+RewriteEngine On
+
+# 1. Force HTTPS Security
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# 2. Serve static files & directories directly if they exist
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# 3. Rewrite Clean Routes to Subdirectory index.html (e.g., /admin -> /admin/index.html)
+RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
+RewriteRule ^(.*)/?$ $1/index.html [L]
+
+# 4. Rewrite Clean Routes to .html files (e.g., /about -> /about.html)
+RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# 5. Handle Custom 404 Page
+ErrorDocument 404 /404/index.html
