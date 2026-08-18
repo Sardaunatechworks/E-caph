@@ -190,3 +190,18 @@ export interface DownloadResource {
   created_at: string;
   updated_at: string;
 }
+
+export interface MediaItem {
+  id: string;
+  title: string;
+  caption: string | null;
+  media_type: 'photo' | 'video' | 'press_release' | 'document';
+  url: string;
+  thumbnail_url: string | null;
+  category: string | null;
+  order_index: number;
+  is_published: boolean;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+}

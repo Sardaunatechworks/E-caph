@@ -135,8 +135,27 @@ CREATE TABLE IF NOT EXISTS public.site_settings (
 ALTER TABLE public.site_settings ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Public read site_settings" ON public.site_settings;
 CREATE POLICY "Public read site_settings" ON public.site_settings FOR SELECT USING (true);
-DROP POLICY IF EXISTS "Admin write site_settings" ON public.site_settings;
-CREATE POLICY "Admin write site_settings" ON public.site_settings FOR ALL USING (true);
+-- 8. MEDIA ITEMS TABLE (Photos, Videos, Press Releases & Statements)
+CREATE TABLE IF NOT EXISTS public.media_items (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  caption TEXT,
+  media_type TEXT NOT NULL DEFAULT 'photo',
+  url TEXT NOT NULL,
+  thumbnail_url TEXT,
+  category TEXT,
+  order_index INT DEFAULT 0,
+  is_published BOOLEAN DEFAULT true,
+  published_at TIMESTAMPTZ DEFAULT now(),
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
+ALTER TABLE public.media_items ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public read media_items" ON public.media_items;
+CREATE POLICY "Public read media_items" ON public.media_items FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Admin write media_items" ON public.media_items;
+CREATE POLICY "Admin write media_items" ON public.media_items FOR ALL USING (true);
 
 -- ============================================================================
 -- INITIAL SEED RECORDS

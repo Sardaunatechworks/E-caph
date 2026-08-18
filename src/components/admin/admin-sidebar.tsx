@@ -12,6 +12,7 @@ import {
   Users,
   Award,
   Image,
+  Camera,
   FileDown,
   TrendingUp,
   Mail,
@@ -38,6 +39,7 @@ export function AdminSidebar({ unreadMessagesCount = 2, onCloseMobile }: Sidebar
     { label: 'Team Members', href: '/admin/team', icon: Users },
     { label: 'Board Members', href: '/admin/board', icon: Award },
     { label: 'Logo & Branding', href: '/admin/logo', icon: Image },
+    { label: 'Media Centre', href: '/admin/media', icon: Camera },
     { label: 'Impact Stats', href: '/admin/impact', icon: TrendingUp },
     {
       label: 'Messages',

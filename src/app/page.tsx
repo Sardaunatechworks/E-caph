@@ -12,6 +12,125 @@ import { createClient } from '@/lib/supabase/server';
 import { ArrowRight, Award, Sparkles, BookOpen, Users, HeartPulse, ShieldCheck, TrendingUp } from 'lucide-react';
 import type { TeamMember, Post, Project, Programme, ImpactStatistic } from '@/types/database';
 
+const defaultHomepageTeam: TeamMember[] = [
+  {
+    id: 'team-1',
+    full_name: 'Dr. Fatima Abubakar',
+    role_title: 'Executive Director & Founder',
+    bio: 'Public health physician leading health systems reform and community interventions.',
+    avatar_url: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80',
+    email: 'fatima@e-caph.org',
+    linkedin_url: null,
+    twitter_url: null,
+    order_index: 1,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'team-2',
+    full_name: 'Ibrahim Sani',
+    role_title: 'Director of Programmes',
+    bio: 'Development strategist overseeing adolescent health and civic accountability initiatives.',
+    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
+    email: 'ibrahim@e-caph.org',
+    linkedin_url: null,
+    twitter_url: null,
+    order_index: 2,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'team-3',
+    full_name: 'Amina Kabir',
+    role_title: 'Head of Public Health & ANC',
+    bio: 'Epidemiologist leading maternal-newborn health tracking and primary health advocacy.',
+    avatar_url: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=600&q=80',
+    email: 'amina@e-caph.org',
+    linkedin_url: null,
+    twitter_url: null,
+    order_index: 3,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'team-4',
+    full_name: 'Yusuf Mohammed',
+    role_title: 'Lead, Gani da Ido & Governance',
+    bio: 'Social accountability expert coordinating Youth Accountability Champions and service scorecards.',
+    avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
+    email: 'yusuf@e-caph.org',
+    linkedin_url: null,
+    twitter_url: null,
+    order_index: 4,
+    is_active: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+];
+
+const defaultHomepagePosts: Post[] = [
+  {
+    id: 'post-1',
+    author_id: null,
+    category_id: null,
+    programme_id: null,
+    project_id: null,
+    title: 'e-CAPH Launches Skills Hub for Women and Youth Economic Empowerment',
+    slug: 'ecaph-launches-skills-hub-women-youth-empowerment',
+    summary: 'Equipping young people and women with high-demand vocational skills, digital technology training, and startup support.',
+    content: 'The e-CAPH Skills Hub equips participants with practical vocational and entrepreneurial skills to foster economic independence.',
+    featured_image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
+    post_type: 'article',
+    status: 'published',
+    published_at: new Date().toISOString(),
+    views_count: 142,
+    is_featured: true,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'post-2',
+    author_id: null,
+    category_id: null,
+    programme_id: null,
+    project_id: null,
+    title: 'Gani da Ido: Youth Accountability Champions Tracking Primary Healthcare Services',
+    slug: 'gani-da-ido-youth-accountability-champions-primary-healthcare',
+    summary: 'Empowering young leaders to monitor community health centers, budget allocations, and public service delivery.',
+    content: 'Youth Accountability Champions collect community scorecards across primary health centers in northern Nigeria.',
+    featured_image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80',
+    post_type: 'report',
+    status: 'published',
+    published_at: new Date().toISOString(),
+    views_count: 98,
+    is_featured: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'post-3',
+    author_id: null,
+    category_id: null,
+    programme_id: null,
+    project_id: null,
+    title: 'Digital ANC Tracking: Enhancing Maternal and Child Survival Rates',
+    slug: 'digital-anc-tracking-maternal-child-survival',
+    summary: 'How mobile technology and community health workers are improving 4th-visit antenatal attendance in rural wards.',
+    content: 'Our digital antenatal care tracking tool connects pregnant women with local primary health centers.',
+    featured_image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80',
+    post_type: 'impact_story',
+    status: 'published',
+    published_at: new Date().toISOString(),
+    views_count: 210,
+    is_featured: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+];
+
 export default async function HomePage() {
   let programmes: Programme[] = [];
   let projects: Project[] = [];
@@ -19,7 +138,6 @@ export default async function HomePage() {
   let posts: Post[] = [];
   let teamMembers: TeamMember[] = [];
 
-  // Crash-proof Supabase data fetching for Vercel deployment
   try {
     const supabase = await createClient();
     const [resProg, resProj, resStat, resPost, resTeam] = await Promise.all([
@@ -35,8 +153,13 @@ export default async function HomePage() {
     stats = (resStat.data as ImpactStatistic[] | null) || [];
     posts = (resPost.data as Post[] | null) || [];
     teamMembers = (resTeam.data as TeamMember[] | null) || [];
-  } catch {
-    // Crash-proof fallback for Vercel deployment
+  } catch {}
+
+  if (teamMembers.length === 0) {
+    teamMembers = defaultHomepageTeam;
+  }
+  if (posts.length === 0) {
+    posts = defaultHomepagePosts;
   }
 
   return (
@@ -78,267 +201,164 @@ export default async function HomePage() {
 
       {/* 2. About e-CAPH Section */}
       <section className="py-20 bg-white border-b border-[#E2E8F0]">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-            {/* Visual Anchor Frame */}
-            <div className="lg:col-span-5">
-              <div className="rounded-[10px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F7FAF8] p-8 space-y-6 brand-shadow card-hover-lift">
-                <Logo />
-                <div className="space-y-2">
-                  <h4 className="font-bold text-xl text-[#0092DF]">
-                    Enhancing Communities Action for Peace and Better Health Initiative
-                  </h4>
-                  <p className="text-xs font-semibold text-[#86C127] uppercase tracking-wider">
-                    Official Registration RC:144280 • Kaduna, Nigeria
-                  </p>
-                </div>
-                <p className="text-xs text-[#64748B] leading-relaxed">
-                  A youth-led non-profit organization operating at the intersection of human rights, public health, and civic empowerment.
-                </p>
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <Badge variant="secondary">Who We Are</Badge>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0092DF] leading-tight">
+                  Action for Health, Rights, and Peace Cohesion
+                </h2>
               </div>
-            </div>
-
-            {/* Content */}
-            <div className="lg:col-span-7 space-y-6">
-              <Badge variant="secondary">About e-CAPH</Badge>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0092DF] leading-tight">
-                Dedicated to Driving Sustainable Development &amp; Community Resilience
-              </h2>
-              <p className="text-[#64748B] text-base leading-relaxed">
+              <p className="text-base text-[#475569] leading-relaxed font-normal">
                 {siteConfig.description}
               </p>
-              <p className="text-[#64748B] text-base leading-relaxed">
-                We empower young people and women to lead inclusive solutions that address health disparities, social inequality, and governance challenges directly within their communities.
-              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-2">
+                <div className="p-4 rounded-[10px] bg-[#F8FAFC] border border-[#E2E8F0] brand-shadow text-center space-y-1">
+                  <HeartPulse className="w-6 h-6 text-[#0092DF] mx-auto" />
+                  <h4 className="text-xs font-extrabold text-[#0092DF]">Public Health</h4>
+                  <p className="text-[11px] text-[#64748B]">Maternal &amp; Youth Care</p>
+                </div>
+
+                <div className="p-4 rounded-[10px] bg-[#F8FAFC] border border-[#E2E8F0] brand-shadow text-center space-y-1">
+                  <Users className="w-6 h-6 text-[#E67817] mx-auto" />
+                  <h4 className="text-xs font-extrabold text-[#0092DF]">Youth Hub</h4>
+                  <p className="text-[11px] text-[#64748B]">Vocational Empowerment</p>
+                </div>
+
+                <div className="p-4 rounded-[10px] bg-[#F8FAFC] border border-[#E2E8F0] brand-shadow text-center space-y-1">
+                  <ShieldCheck className="w-6 h-6 text-[#86C127] mx-auto" />
+                  <h4 className="text-xs font-extrabold text-[#0092DF]">Accountability</h4>
+                  <p className="text-[11px] text-[#64748B]">Gani da Ido Project</p>
+                </div>
+              </div>
+
               <div className="pt-2">
                 <Link href="/about">
-                  <Button variant="outline" size="default" className="group">
-                    Read Our Full Story <ArrowRight className="ml-2 w-4 h-4 text-[#E67817] transition-transform duration-200 group-hover:translate-x-1" />
+                  <Button className="bg-[#86C127] hover:bg-[#75A922] text-white font-bold text-xs">
+                    Read Our Full Profile <ArrowRight className="w-4 h-4 ml-1.5" />
                   </Button>
                 </Link>
               </div>
             </div>
+
+            <div className="relative">
+              <div className="aspect-4/3 rounded-[20px] bg-gradient-to-tr from-[#003D60] to-[#0092DF] p-8 text-white brand-shadow-lg flex flex-col justify-between relative overflow-hidden">
+                <div className="space-y-4 relative z-10">
+                  <Logo variant="white" showText={false} className="mb-4" />
+                  <h3 className="text-2xl font-black text-white leading-snug">
+                    Bridging Community Needs With Evidence &amp; Youth Innovation
+                  </h3>
+                  <p className="text-xs text-slate-100 leading-relaxed max-w-md">
+                    Operating in Northern Nigeria with registered CAC certificate RC:144280. Empowering local health centers, adolescent girls, and youth advocates.
+                  </p>
+                </div>
+
+                <div className="pt-6 border-t border-white/20 flex items-center justify-between text-xs text-slate-200 relative z-10 font-bold">
+                  <span>CAC Registered: RC:144280</span>
+                  <span>Kaduna, Nigeria</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* 3. Mission and Vision Section */}
+      {/* 3. Strategic Focus Areas */}
       <section className="py-20 bg-[#F3F7F5] border-b border-[#E2E8F0]">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="p-8 rounded-[10px] bg-white border border-[#E2E8F0] brand-shadow card-hover-lift space-y-4 relative overflow-hidden group">
-            <div className="w-full h-1 bg-[#86C127] absolute top-0 left-0"></div>
-            <div className="w-10 h-10 rounded-[6px] bg-[#FDF2E8] text-[#E67817] flex items-center justify-center transition-transform duration-200 group-hover:scale-110">
-              <Award className="w-5 h-5" />
-            </div>
-            <h3 className="text-2xl font-bold text-[#0092DF]">Our Mission</h3>
-            <p className="text-[#64748B] text-sm leading-relaxed">
-              {siteConfig.mission}
-            </p>
-          </div>
-
-          <div className="p-8 rounded-[10px] bg-white border border-[#E2E8F0] brand-shadow card-hover-lift space-y-4 relative overflow-hidden group">
-            <div className="w-full h-1 bg-[#86C127] absolute top-0 left-0"></div>
-            <div className="w-10 h-10 rounded-[6px] bg-[#FDF2E8] text-[#E67817] flex items-center justify-center transition-transform duration-200 group-hover:scale-110">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <h3 className="text-2xl font-bold text-[#0092DF]">Our Vision</h3>
-            <p className="text-[#64748B] text-sm leading-relaxed">
-              {siteConfig.vision}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Thematic Focus Areas */}
-      <section className="py-20 bg-white border-b border-[#E2E8F0]">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <Badge variant="secondary">Core Pillars</Badge>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0092DF]">
-              Thematic Focus Areas
+              Strategic Thematic Areas
             </h2>
-            <p className="text-[#64748B] text-sm leading-relaxed">
-              Our work spans integrated focus areas designed to build healthy, educated, and peaceful communities.
+            <p className="text-sm text-[#64748B] leading-relaxed">
+              Our integrated programmatic pillars address interconnected health, rights, peace, and economic challenges.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {programmes.length > 0
-              ? programmes.map((prog, idx) => (
-                  <FocusAreaCard
-                    key={prog.id}
-                    slug={prog.slug}
-                    title={prog.title}
-                    description={prog.description}
-                    index={idx}
-                  />
-                ))
-              : thematicFocusAreas.map((area, idx) => (
-                  <FocusAreaCard
-                    key={area.slug}
-                    slug={area.slug}
-                    title={area.title}
-                    description={area.description}
-                    index={idx}
-                  />
-                ))}
+            {thematicFocusAreas.map((area) => (
+              <FocusAreaCard key={area.id} area={area} />
+            ))}
           </div>
         </div>
       </section>
 
-      {/* 5. Impact Statistics Section */}
-      <section className="py-16 bg-[#F3F7F5] border-b border-[#E2E8F0]">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
-            {stats.length > 0 ? (
-              stats.map((st) => (
-                <div key={st.id} className="space-y-2 p-6 rounded-[10px] bg-white border border-[#E2E8F0] brand-shadow card-hover-lift group">
-                  <div className="w-10 h-10 rounded-[6px] bg-[#F3F9E9] text-[#86C127] mx-auto flex items-center justify-center mb-2 transition-transform duration-200 group-hover:scale-110">
-                    <TrendingUp className="w-5 h-5" />
-                  </div>
-                  <div className="text-4xl font-extrabold text-[#0092DF]">
-                    {(st.value ?? st.numeric_value ?? 0).toLocaleString()}{st.suffix || '+'}
-                  </div>
-                  <div className="text-xs font-bold text-[#86C127] uppercase tracking-wider">{st.label}</div>
-                </div>
-              ))
-            ) : (
-              <>
-                <div className="space-y-2 p-6 rounded-[10px] bg-white border border-[#E2E8F0] brand-shadow card-hover-lift group">
-                  <div className="w-10 h-10 rounded-[6px] bg-[#F3F9E9] text-[#86C127] mx-auto flex items-center justify-center mb-2">
-                    <Users className="w-5 h-5" />
-                  </div>
-                  <div className="text-4xl font-extrabold text-[#0092DF]">95,000+</div>
-                  <div className="text-xs font-bold text-[#86C127] uppercase tracking-wider">Young People Reached</div>
-                </div>
-                <div className="space-y-2 p-6 rounded-[10px] bg-white border border-[#E2E8F0] brand-shadow card-hover-lift group">
-                  <div className="w-10 h-10 rounded-[6px] bg-[#F3F9E9] text-[#86C127] mx-auto flex items-center justify-center mb-2">
-                    <HeartPulse className="w-5 h-5" />
-                  </div>
-                  <div className="text-4xl font-extrabold text-[#0092DF]">36+</div>
-                  <div className="text-xs font-bold text-[#86C127] uppercase tracking-wider">Schools &amp; Hubs Engaged</div>
-                </div>
-                <div className="space-y-2 p-6 rounded-[10px] bg-white border border-[#E2E8F0] brand-shadow card-hover-lift group">
-                  <div className="w-10 h-10 rounded-[6px] bg-[#F3F9E9] text-[#86C127] mx-auto flex items-center justify-center mb-2">
-                    <ShieldCheck className="w-5 h-5" />
-                  </div>
-                  <div className="text-4xl font-extrabold text-[#0092DF]">120+</div>
-                  <div className="text-xs font-bold text-[#86C127] uppercase tracking-wider">Communities Served</div>
-                </div>
-                <div className="space-y-2 p-6 rounded-[10px] bg-white border border-[#E2E8F0] brand-shadow card-hover-lift group">
-                  <div className="w-10 h-10 rounded-[6px] bg-[#F3F9E9] text-[#86C127] mx-auto flex items-center justify-center mb-2">
-                    <TrendingUp className="w-5 h-5" />
-                  </div>
-                  <div className="text-4xl font-extrabold text-[#0092DF]">45,000+</div>
-                  <div className="text-xs font-bold text-[#86C127] uppercase tracking-wider">Health Interventions</div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* 6. Flagship Initiatives */}
+      {/* 4. Flagship Initiatives */}
       <section className="py-20 bg-white border-b border-[#E2E8F0]">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-3 max-w-2xl">
-              <Badge variant="secondary">Key Projects</Badge>
+              <Badge variant="secondary">Featured Programs</Badge>
               <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0092DF]">
-                Flagship Initiatives
+                Flagship Interventions
               </h2>
-              <p className="text-[#64748B] text-sm">
-                Targeted, community-centered programs delivering measurable change across northern Nigeria.
-              </p>
             </div>
             <Link href="/projects" className="text-xs font-bold text-[#E67817] hover:underline flex items-center shrink-0 group">
               View All Projects <ArrowRight className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:translate-x-1" />
             </Link>
           </div>
 
-          {projects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {projects.map((proj) => (
-                <InitiativeCard
-                  key={proj.id}
-                  id={proj.id}
-                  title={proj.title}
-                  category={proj.category || 'Public Health'}
-                  description={proj.summary}
-                  location={proj.location || 'Nigeria'}
-                  isFeatured={proj.is_flagship}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <InitiativeCard {...flagshipInitiatives[0]} />
-              </div>
-              <div className="space-y-6">
-                {flagshipInitiatives.slice(1, 3).map((item) => (
-                  <InitiativeCard key={item.id} {...item} />
-                ))}
-              </div>
-            </div>
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {flagshipInitiatives.map((initiative) => (
+              <InitiativeCard key={initiative.id} initiative={initiative} />
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* 7. Our Approach */}
+      {/* 5. Impact Counter Strip */}
+      <section className="py-16 bg-[#003D60] text-white">
+        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div className="space-y-2">
+              <div className="text-4xl sm:text-5xl font-black text-[#86C127]">15,000+</div>
+              <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">Beneficiaries Reached</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-4xl sm:text-5xl font-black text-[#E67817]">40+</div>
+              <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">Health Centers Monitored</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-4xl sm:text-5xl font-black text-[#0092DF]">120+</div>
+              <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">Youth Champions Trained</div>
+            </div>
+            <div className="space-y-2">
+              <div className="text-4xl sm:text-5xl font-black text-[#86C127]">250+</div>
+              <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">Women Skills Hub Graduates</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Technical Approaches */}
       <section className="py-20 bg-[#F3F7F5] border-b border-[#E2E8F0]">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <Badge variant="secondary">Methodology</Badge>
             <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0092DF]">
-              Our Technical Approach
+              How We Deliver Lasting Change
             </h2>
-            <p className="text-[#64748B] text-sm">
-              Cross-cutting strategies embedded across all e-CAPH interventions.
-            </p>
           </div>
 
-          <div className="space-y-4 max-w-4xl mx-auto">
-            {technicalApproaches.map((item) => (
-              <div
-                key={item.number}
-                className="p-6 rounded-[10px] bg-white border border-[#E2E8F0] brand-shadow card-hover-lift flex items-start gap-6 hover:border-[#0092DF]/40 transition-all duration-200"
-              >
-                <span className="text-2xl font-extrabold text-[#E67817] shrink-0">
-                  {item.number}
-                </span>
-                <div className="space-y-1">
-                  <h3 className="text-lg font-bold text-[#0092DF]">{item.title}</h3>
-                  <p className="text-sm text-[#64748B] leading-relaxed">{item.description}</p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {technicalApproaches.map((tech, idx) => (
+              <div key={idx} className="p-6 rounded-[10px] bg-white border border-[#E2E8F0] brand-shadow space-y-3 hover:brand-shadow-lg transition-all duration-200">
+                <div className="w-10 h-10 rounded-[6px] bg-[#E6F4FC] text-[#0092DF] flex items-center justify-center font-bold text-sm">
+                  0{idx + 1}
                 </div>
+                <h3 className="text-base font-bold text-[#0092DF]">{tech.title}</h3>
+                <p className="text-xs text-[#64748B] leading-relaxed">{tech.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 8. Featured Story */}
-      <section className="py-20 bg-white border-b border-[#E2E8F0]">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-[10px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F7FAF8] p-8 sm:p-12 space-y-6 brand-shadow card-hover-lift">
-            <Badge variant="secondary">Community Impact Story</Badge>
-            <h3 className="text-2xl sm:text-3xl font-bold text-[#0092DF]">
-              Strengthening Primary Healthcare Through Youth-Led Accountability
-            </h3>
-            <p className="text-[#64748B] text-base leading-relaxed max-w-3xl">
-              Through the Gani da Ido initiative, local youth advocates in Kaduna have monitored over 40 primary healthcare centers, engaging local health committees to improve drug availability and maternal health service quality.
-            </p>
-            <Link href="/stories" className="inline-block pt-2">
-              <Button className="bg-[#0092DF] hover:bg-[#007DC2] text-white font-bold group">
-                Read Impact Case Study <ArrowRight className="ml-2 w-4 h-4 text-[#E67817] transition-transform duration-200 group-hover:translate-x-1" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
       {/* 9. Latest News & Stories */}
-      <section className="py-20 bg-[#F3F7F5] border-b border-[#E2E8F0]">
+      <section className="py-20 bg-white border-b border-[#E2E8F0]">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="space-y-3 max-w-2xl">
@@ -352,51 +372,28 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {posts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {posts.map((post) => (
-                <div key={post.id} className="rounded-[10px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-white p-6 brand-shadow card-hover-lift flex flex-col justify-between space-y-4">
-                  <div className="space-y-3">
-                    <Badge variant="secondary" className="text-[11px] uppercase">
-                      {post.post_type.replace('_', ' ')}
-                    </Badge>
-                    <h3 className="text-lg font-bold text-[#0092DF] leading-snug hover:text-[#007DC2] transition-colors">
-                      {post.title}
-                    </h3>
-                    <p className="text-xs text-[#64748B] line-clamp-3 leading-relaxed">{post.summary}</p>
-                  </div>
-                  <Link href="/stories" className="text-xs font-bold text-[#E67817] hover:underline inline-flex items-center group/link">
-                    Read Article <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform duration-200 group-hover/link:translate-x-1" />
-                  </Link>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {posts.map((post) => (
+              <div key={post.id} className="rounded-[12px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F8FAFC] p-6 brand-shadow hover:brand-shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group">
+                <div className="space-y-3">
+                  {post.featured_image && (
+                    <div className="aspect-video w-full rounded-[8px] bg-[#E2E8F0] overflow-hidden border border-slate-200 shadow-xs mb-3">
+                      <img src={post.featured_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
+                    </div>
+                  )}
+                  <Badge variant="secondary" className="text-[11px] uppercase bg-[#E6F4FC] text-[#0092DF] font-bold">
+                    {post.post_type.replace('_', ' ')}
+                  </Badge>
+                  <h3 className="text-lg font-extrabold text-[#0092DF] leading-snug group-hover:text-[#007DC2] transition-colors">
+                    {post.title}
+                  </h3>
+                  <p className="text-xs text-[#64748B] line-clamp-3 leading-relaxed">{post.summary}</p>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="p-8 rounded-[10px] border border-[#E2E8F0] bg-white text-center space-y-3 brand-shadow">
-              <BookOpen className="w-10 h-10 text-[#94A3B8] mx-auto" />
-              <h4 className="font-bold text-[#1E293B]">Recent publications</h4>
-              <p className="text-xs text-[#64748B] max-w-md mx-auto">
-                Visit our news section for upcoming reports and announcements.
-              </p>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* 10. Partner Section */}
-      <section className="py-16 bg-white border-b border-[#E2E8F0]">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8 text-center">
-          <p className="text-xs font-bold text-[#64748B] uppercase tracking-wider">
-            Collaborating With Civil Society &amp; International Development Partners
-          </p>
-          <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 text-[#64748B] font-bold text-sm">
-            <span className="hover:text-[#0092DF] transition-colors duration-200 cursor-default">Public Health Agencies</span>
-            <span className="text-slate-300">•</span>
-            <span className="hover:text-[#0092DF] transition-colors duration-200 cursor-default">Youth Alliances</span>
-            <span className="text-slate-300">•</span>
-            <span className="hover:text-[#0092DF] transition-colors duration-200 cursor-default">Grassroots CSOs</span>
-            <span className="text-slate-300">•</span>
-            <span className="hover:text-[#0092DF] transition-colors duration-200 cursor-default">Research Partners</span>
+                <Link href="/stories" className="text-xs font-bold text-[#E67817] hover:underline inline-flex items-center group/link pt-2 border-t border-[#E2E8F0]">
+                  Read Article <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform duration-200 group-hover/link:translate-x-1" />
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -416,56 +413,51 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {teamMembers.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-              {teamMembers.map((member, idx) => {
-                const initials = member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2);
-                const accentColors = ['bg-[#E67817]', 'bg-[#86C127]', 'bg-[#0092DF]', 'bg-[#E67817]'];
-                const accent = accentColors[idx % accentColors.length];
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            {teamMembers.map((member, idx) => {
+              const initials = member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2);
+              const accentColors = ['bg-[#E67817]', 'bg-[#86C127]', 'bg-[#0092DF]', 'bg-[#E67817]'];
+              const accent = accentColors[idx % accentColors.length];
 
-                return (
-                  <div key={member.id} className="flex flex-col items-center text-center space-y-6 group">
-                    {/* Photo Card with Offset Accent Background */}
-                    <div className="relative w-full max-w-[260px]">
-                      <div
-                        className={`absolute inset-0 translate-x-3 translate-y-3 rounded-[20px] ${accent} transition-transform duration-300 group-hover:translate-x-4 group-hover:translate-y-4`}
-                      />
-                      <div className="relative aspect-square w-full rounded-[20px] bg-[#D1D5DB] overflow-hidden border border-slate-200/80 shadow-sm">
-                        {member.avatar_url ? (
-                          <img
-                            src={member.avatar_url}
-                            alt={member.full_name}
-                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-[#CBD5E1]">
-                            <div className="w-16 h-16 rounded-full bg-[#0092DF] text-white flex items-center justify-center text-xl font-black shadow-md">
-                              {initials}
-                            </div>
+              return (
+                <div key={member.id} className="flex flex-col items-center text-center space-y-6 group">
+                  {/* Photo Card with Offset Accent Background */}
+                  <div className="relative w-full max-w-[260px]">
+                    <div
+                      className={`absolute inset-0 translate-x-3 translate-y-3 rounded-[20px] ${accent} transition-transform duration-300 group-hover:translate-x-4 group-hover:translate-y-4`}
+                    />
+                    <div className="relative aspect-square w-full rounded-[20px] bg-[#D1D5DB] overflow-hidden border border-slate-200/80 shadow-sm">
+                      {member.avatar_url ? (
+                        <img
+                          src={member.avatar_url}
+                          alt={member.full_name}
+                          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-[#CBD5E1]">
+                          <div className="w-16 h-16 rounded-full bg-[#0092DF] text-white flex items-center justify-center text-xl font-black shadow-md">
+                            {initials}
                           </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Member Name and Position Only */}
-                    <div className="space-y-1 pt-1">
-                      <h3 className="text-base font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
-                        {member.full_name}
-                      </h3>
-                      <p className="text-xs text-[#64748B] font-semibold tracking-wide">
-                        {member.role_title}
-                      </p>
+                        </div>
+                      )}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="p-8 rounded-[10px] bg-white border border-[#E2E8F0] text-center space-y-2">
-              <Users className="w-10 h-10 text-[#94A3B8] mx-auto" />
-              <p className="text-sm text-[#64748B]">Team roster being updated. Learn more on our About page.</p>
-            </div>
-          )}
+
+                  {/* Member Name and Position Only */}
+                  <div className="space-y-1 pt-1">
+                    <h3 className="text-base font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
+                      {member.full_name}
+                    </h3>
+                    <p className="text-xs text-[#E67817] font-bold uppercase tracking-wider">
+                      {member.role_title}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
@@ -478,22 +470,16 @@ export default async function HomePage() {
           <p className="text-slate-200 text-base leading-relaxed max-w-2xl mx-auto">
             Partner with e-CAPH to support youth-led solutions that create lasting community impact across Nigeria.
           </p>
-          <div className="pt-4 flex flex-wrap justify-center gap-4">
-            <Link href="/contact?type=partnership">
-              <Button size="lg" className="bg-[#0092DF] hover:bg-[#007DC2] text-white font-extrabold shadow-md transition-transform duration-200 hover:scale-[1.02] active:scale-[0.98]">
-                Partner With Us
-              </Button>
-            </Link>
+          <div className="pt-2">
             <Link href="/contact">
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10 bg-transparent transition-all duration-200 group">
-                Contact Our Team <ArrowRight className="ml-2 w-4 h-4 text-[#E67817] transition-transform duration-200 group-hover:translate-x-1" />
+              <Button size="lg" className="bg-[#E67817] hover:bg-[#CF660F] text-white font-bold shadow-md">
+                Get In Touch With Us
               </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* 13. Footer */}
       <Footer />
     </div>
   );
