@@ -7,16 +7,17 @@ import { PageBanner } from '@/components/common/page-banner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
-import { Camera, Video, FileText, Play, ExternalLink, Calendar } from 'lucide-react';
+import { Camera, Play, ExternalLink, Calendar, FileText } from 'lucide-react';
+import { officialMediaItems } from '@/config/theme';
 import type { MediaItem } from '@/types/database';
 
 export default function MediaPage() {
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>(officialMediaItems);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [selectedMediaPreview, setSelectedMediaPreview] = useState<MediaItem | null>(null);
 
   const fetchMedia = async () => {
-    let currentList: MediaItem[] = [];
+    let currentList: MediaItem[] = officialMediaItems;
 
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_media_items');
@@ -101,119 +102,111 @@ export default function MediaPage() {
           </div>
 
           {/* Media Items Grid */}
-          {filteredItems.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredItems.map((item) => (
-                <div
-                  key={item.id}
-                  className="rounded-[16px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F8FAFC] p-6 brand-shadow hover:brand-shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group"
-                >
-                  <div className="space-y-4">
-                    {/* Media Thumbnail Container */}
-                    <div
-                      onClick={() => setSelectedMediaPreview(item)}
-                      className="aspect-video w-full rounded-[10px] bg-[#E2E8F0] overflow-hidden border border-slate-200 relative cursor-pointer group/img flex items-center justify-center shadow-xs"
-                    >
-                      {item.media_type === 'photo' || item.media_type === 'document' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredItems.map((item) => (
+              <div
+                key={item.id}
+                className="rounded-[16px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F8FAFC] p-6 brand-shadow hover:brand-shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group"
+              >
+                <div className="space-y-4">
+                  {/* Media Thumbnail Container */}
+                  <div
+                    onClick={() => setSelectedMediaPreview(item)}
+                    className="aspect-video w-full rounded-[10px] bg-[#E2E8F0] overflow-hidden border border-slate-200 relative cursor-pointer group/img flex items-center justify-center shadow-xs"
+                  >
+                    {item.media_type === 'photo' || item.media_type === 'document' ? (
+                      <img
+                        src={item.url}
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    ) : item.media_type === 'video' ? (
+                      <div className="relative w-full h-full">
                         <img
-                          src={item.url}
+                          src={
+                            item.thumbnail_url ||
+                            'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80'
+                          }
                           alt={item.title}
                           className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300"
                           loading="lazy"
                           decoding="async"
                         />
-                      ) : item.media_type === 'video' ? (
-                        <div className="relative w-full h-full">
-                          <img
-                            src={
-                              item.thumbnail_url ||
-                              'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80'
-                            }
-                            alt={item.title}
-                            className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                          <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center">
-                            <div className="w-12 h-12 rounded-full bg-[#0092DF] text-white flex items-center justify-center shadow-lg group-hover/img:scale-110 transition-transform">
-                              <Play className="w-6 h-6 fill-current ml-1" />
-                            </div>
+                        <div className="absolute inset-0 bg-slate-900/40 flex items-center justify-center">
+                          <div className="w-12 h-12 rounded-full bg-[#0092DF] text-white flex items-center justify-center shadow-lg group-hover/img:scale-110 transition-transform">
+                            <Play className="w-6 h-6 fill-current ml-1" />
                           </div>
                         </div>
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-white text-[#0092DF] p-6 text-center space-y-2 flex-col">
-                          <FileText className="w-12 h-12 text-[#E67817]" />
-                          <span className="text-xs font-extrabold text-[#0092DF]">Press Release Statement</span>
-                        </div>
-                      )}
-
-                      <div className="absolute top-3 right-3">
-                        <Badge className="bg-[#0092DF] text-white text-[10px] font-bold uppercase shadow-xs">
-                          {item.media_type.replace('_', ' ')}
-                        </Badge>
                       </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xs text-[#64748B]">
-                        <span className="font-bold text-[#E67817] uppercase tracking-wider">
-                          {item.category || 'e-CAPH Media'}
-                        </span>
-                        <span className="flex items-center gap-1 font-medium">
-                          <Calendar className="w-3.5 h-3.5 text-[#0092DF]" />
-                          {new Date(item.published_at || item.created_at).toLocaleDateString()}
-                        </span>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-white text-[#0092DF] p-6 text-center space-y-2 flex-col">
+                        <FileText className="w-12 h-12 text-[#E67817]" />
+                        <span className="text-xs font-extrabold text-[#0092DF]">Press Release Statement</span>
                       </div>
+                    )}
 
-                      <h3
-                        onClick={() => setSelectedMediaPreview(item)}
-                        className="text-lg font-extrabold text-[#0092DF] leading-snug group-hover:text-[#007DC2] transition-colors cursor-pointer"
-                      >
-                        {item.title}
-                      </h3>
-
-                      {item.caption && (
-                        <p className="text-xs text-[#475569] leading-relaxed line-clamp-3">
-                          {item.caption}
-                        </p>
-                      )}
+                    <div className="absolute top-3 right-3">
+                      <Badge className="bg-[#0092DF] text-white text-[10px] font-bold uppercase shadow-xs">
+                        {item.media_type.replace('_', ' ')}
+                      </Badge>
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between">
-                    <Button
-                      onClick={() => setSelectedMediaPreview(item)}
-                      variant="outline"
-                      size="sm"
-                      className="text-xs font-bold text-[#0092DF] border-[#E2E8F0] hover:bg-[#E6F4FC]"
-                    >
-                      {item.media_type === 'video'
-                        ? 'Watch Video'
-                        : item.media_type === 'press_release'
-                        ? 'Read Statement'
-                        : 'View Full Photo'}
-                    </Button>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-xs text-[#64748B]">
+                      <span className="font-bold text-[#E67817] uppercase tracking-wider">
+                        {item.category || 'e-CAPH Media'}
+                      </span>
+                      <span className="flex items-center gap-1 font-medium">
+                        <Calendar className="w-3.5 h-3.5 text-[#0092DF]" />
+                        {new Date(item.published_at || item.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
 
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-slate-400 hover:text-[#0092DF] p-1 transition-colors"
-                      title="Open Resource URL"
+                    <h3
+                      onClick={() => setSelectedMediaPreview(item)}
+                      className="text-lg font-extrabold text-[#0092DF] leading-snug group-hover:text-[#007DC2] transition-colors cursor-pointer"
                     >
-                      <ExternalLink className="w-4 h-4" />
-                    </a>
+                      {item.title}
+                    </h3>
+
+                    {item.caption && (
+                      <p className="text-xs text-[#475569] leading-relaxed line-clamp-3">
+                        {item.caption}
+                      </p>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="p-16 text-center rounded-[16px] bg-[#F8FAFC] border border-[#E2E8F0] brand-shadow space-y-3">
-              <Camera className="w-12 h-12 text-[#94A3B8] mx-auto" />
-              <h3 className="text-lg font-bold text-[#1E293B]">No Media Items Found in Database</h3>
-              <p className="text-xs text-[#64748B]">Photos and media published in the Admin CMS will automatically appear here.</p>
-            </div>
-          )}
+
+                <div className="pt-3 border-t border-[#E2E8F0] flex items-center justify-between">
+                  <Button
+                    onClick={() => setSelectedMediaPreview(item)}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs font-bold text-[#0092DF] border-[#E2E8F0] hover:bg-[#E6F4FC]"
+                  >
+                    {item.media_type === 'video'
+                      ? 'Watch Video'
+                      : item.media_type === 'press_release'
+                      ? 'Read Statement'
+                      : 'View Full Photo'}
+                  </Button>
+
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-slate-400 hover:text-[#0092DF] p-1 transition-colors"
+                    title="Open Resource URL"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

@@ -9,15 +9,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { createClient } from '@/lib/supabase/client';
 import { MapPin, FolderKanban, Sparkles, ArrowRight, Search, CheckCircle2 } from 'lucide-react';
+import { officialProjects } from '@/config/theme';
 import type { Project } from '@/types/database';
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const [projects, setProjects] = useState<Project[]>(officialProjects);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const fetchProjects = async () => {
-    let currentList: Project[] = [];
+    let currentList: Project[] = officialProjects;
 
     // 1. Check local storage
     if (typeof window !== 'undefined') {
@@ -89,10 +90,10 @@ export default function ProjectsPage() {
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-[#E2E8F0]">
             <div className="space-y-2 text-center md:text-left">
               <Badge variant="secondary" className="bg-[#86C127] text-white font-bold uppercase text-[10px]">
-                Live Projects Directory
+                Projects Directory
               </Badge>
               <h2 className="text-3xl font-extrabold text-[#0092DF]">
-                All Field Projects ({filteredProjects.length})
+                All Field Projects &amp; Initiatives ({filteredProjects.length})
               </h2>
             </div>
 
@@ -108,73 +109,65 @@ export default function ProjectsPage() {
           </div>
 
           {/* Full Grid of All Projects */}
-          {filteredProjects.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredProjects.map((project) => (
-                <div
-                  key={project.id}
-                  className="rounded-[16px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F8FAFC] p-6 brand-shadow hover:brand-shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6 group"
-                >
-                  <div className="space-y-4">
-                    {/* Project Featured Cover Image */}
-                    {project.featured_image && (
-                      <div className="aspect-video w-full rounded-[10px] bg-[#E2E8F0] overflow-hidden border border-slate-200 shadow-xs">
-                        <img
-                          src={project.featured_image}
-                          alt={project.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F3F9E9] text-[#6EA71F] text-[11px] font-extrabold uppercase">
-                        <Sparkles className="w-3.5 h-3.5 text-[#86C127]" /> {project.status || 'Ongoing'}
-                      </span>
-                      {project.location && (
-                        <span className="text-xs text-[#64748B] flex items-center gap-1 font-semibold">
-                          <MapPin className="w-3.5 h-3.5 text-[#E67817]" />
-                          {project.location}
-                        </span>
-                      )}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredProjects.map((project) => (
+              <div
+                key={project.id}
+                className="rounded-[16px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F8FAFC] p-6 brand-shadow hover:brand-shadow-lg transition-all duration-300 flex flex-col justify-between space-y-6 group"
+              >
+                <div className="space-y-4">
+                  {/* Project Featured Cover Image */}
+                  {project.featured_image && (
+                    <div className="aspect-video w-full rounded-[10px] bg-[#E2E8F0] overflow-hidden border border-slate-200 shadow-xs">
+                      <img
+                        src={project.featured_image}
+                        alt={project.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                        decoding="async"
+                      />
                     </div>
+                  )}
 
-                    <h3 className="text-xl font-extrabold text-[#0092DF] leading-snug group-hover:text-[#007DC2] transition-colors">
-                      {project.title}
-                    </h3>
-
-                    <p className="text-xs text-[#475569] leading-relaxed font-normal line-clamp-3">
-                      {project.summary}
-                    </p>
-
-                    {project.target_beneficiaries && (
-                      <div className="p-3 rounded-[8px] bg-white border border-[#E2E8F0] text-[11px] text-[#64748B] font-medium space-y-1">
-                        <span className="font-bold text-[#0092DF] block">Target Beneficiaries:</span>
-                        <p>{project.target_beneficiaries}</p>
-                      </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#F3F9E9] text-[#6EA71F] text-[11px] font-extrabold uppercase">
+                      <Sparkles className="w-3.5 h-3.5 text-[#86C127]" /> {project.status || 'Ongoing'}
+                    </span>
+                    {project.location && (
+                      <span className="text-xs text-[#64748B] flex items-center gap-1 font-semibold">
+                        <MapPin className="w-3.5 h-3.5 text-[#E67817]" />
+                        {project.location}
+                      </span>
                     )}
                   </div>
 
-                  <div className="pt-4 border-t border-[#E2E8F0]">
-                    <Button
-                      onClick={() => setSelectedProject(project)}
-                      className="w-full bg-[#0092DF] hover:bg-[#007DC2] text-white font-bold text-xs"
-                    >
-                      View Full Project Details <ArrowRight className="w-4 h-4 ml-2 text-[#E67817]" />
-                    </Button>
-                  </div>
+                  <h3 className="text-xl font-extrabold text-[#0092DF] leading-snug group-hover:text-[#007DC2] transition-colors">
+                    {project.title}
+                  </h3>
+
+                  <p className="text-xs text-[#475569] leading-relaxed font-normal line-clamp-3">
+                    {project.summary}
+                  </p>
+
+                  {project.target_beneficiaries && (
+                    <div className="p-3 rounded-[8px] bg-white border border-[#E2E8F0] text-[11px] text-[#64748B] font-medium space-y-1">
+                      <span className="font-bold text-[#0092DF] block">Target Beneficiaries:</span>
+                      <p>{project.target_beneficiaries}</p>
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="p-16 text-center rounded-[16px] bg-[#F8FAFC] border border-[#E2E8F0] brand-shadow space-y-3">
-              <FolderKanban className="w-12 h-12 text-[#94A3B8] mx-auto" />
-              <h3 className="text-lg font-bold text-[#1E293B]">No Projects Found in Database</h3>
-              <p className="text-xs text-[#64748B]">Projects created in the Admin CMS will automatically display here.</p>
-            </div>
-          )}
+
+                <div className="pt-4 border-t border-[#E2E8F0]">
+                  <Button
+                    onClick={() => setSelectedProject(project)}
+                    className="w-full bg-[#0092DF] hover:bg-[#007DC2] text-white font-bold text-xs"
+                  >
+                    View Full Project Details <ArrowRight className="w-4 h-4 ml-2 text-[#E67817]" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

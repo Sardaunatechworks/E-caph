@@ -10,6 +10,7 @@ import { InitiativeCard } from '@/components/common/initiative-card';
 import { Logo } from '@/components/common/logo';
 import { createClient } from '@/lib/supabase/server';
 import { ArrowRight, Award, Sparkles, BookOpen, Users, HeartPulse, ShieldCheck, TrendingUp } from 'lucide-react';
+import { officialTeamMembers, officialPosts } from '@/config/theme';
 import type { TeamMember, Post, Project, Programme, ImpactStatistic } from '@/types/database';
 
 export default async function HomePage() {
@@ -35,6 +36,13 @@ export default async function HomePage() {
     posts = (resPost.data as Post[] | null) || [];
     teamMembers = (resTeam.data as TeamMember[] | null) || [];
   } catch {}
+
+  if (teamMembers.length === 0) {
+    teamMembers = officialTeamMembers;
+  }
+  if (posts.length === 0) {
+    posts = officialPosts;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7FAF8] text-[#1E293B] font-sans">
@@ -260,39 +268,29 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {posts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {posts.map((post) => (
-                <div key={post.id} className="rounded-[12px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F8FAFC] p-6 brand-shadow hover:brand-shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group">
-                  <div className="space-y-3">
-                    {post.featured_image && (
-                      <div className="aspect-video w-full rounded-[8px] bg-[#E2E8F0] overflow-hidden border border-slate-200 shadow-xs mb-3">
-                        <img src={post.featured_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
-                      </div>
-                    )}
-                    <Badge variant="secondary" className="text-[11px] uppercase bg-[#E6F4FC] text-[#0092DF] font-bold">
-                      {post.post_type.replace('_', ' ')}
-                    </Badge>
-                    <h3 className="text-lg font-extrabold text-[#0092DF] leading-snug group-hover:text-[#007DC2] transition-colors">
-                      {post.title}
-                    </h3>
-                    <p className="text-xs text-[#64748B] line-clamp-3 leading-relaxed">{post.summary}</p>
-                  </div>
-                  <Link href="/stories" className="text-xs font-bold text-[#E67817] hover:underline inline-flex items-center group/link pt-2 border-t border-[#E2E8F0]">
-                    Read Article <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform duration-200 group-hover/link:translate-x-1" />
-                  </Link>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {posts.map((post) => (
+              <div key={post.id} className="rounded-[12px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F8FAFC] p-6 brand-shadow hover:brand-shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group">
+                <div className="space-y-3">
+                  {post.featured_image && (
+                    <div className="aspect-video w-full rounded-[8px] bg-[#E2E8F0] overflow-hidden border border-slate-200 shadow-xs mb-3">
+                      <img src={post.featured_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
+                    </div>
+                  )}
+                  <Badge variant="secondary" className="text-[11px] uppercase bg-[#E6F4FC] text-[#0092DF] font-bold">
+                    {post.post_type.replace('_', ' ')}
+                  </Badge>
+                  <h3 className="text-lg font-extrabold text-[#0092DF] leading-snug group-hover:text-[#007DC2] transition-colors">
+                    {post.title}
+                  </h3>
+                  <p className="text-xs text-[#64748B] line-clamp-3 leading-relaxed">{post.summary}</p>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="p-8 rounded-[12px] border border-[#E2E8F0] bg-[#F8FAFC] text-center space-y-3 brand-shadow">
-              <BookOpen className="w-10 h-10 text-[#94A3B8] mx-auto" />
-              <h4 className="font-bold text-[#1E293B]">No Published Articles Yet</h4>
-              <p className="text-xs text-[#64748B] max-w-md mx-auto">
-                Articles and field updates published in the Admin CMS will appear here dynamically.
-              </p>
-            </div>
-          )}
+                <Link href="/stories" className="text-xs font-bold text-[#E67817] hover:underline inline-flex items-center group/link pt-2 border-t border-[#E2E8F0]">
+                  Read Article <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform duration-200 group-hover/link:translate-x-1" />
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -311,59 +309,51 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {teamMembers.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-              {teamMembers.map((member, idx) => {
-                const initials = member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2);
-                const accentColors = ['bg-[#E67817]', 'bg-[#86C127]', 'bg-[#0092DF]', 'bg-[#E67817]'];
-                const accent = accentColors[idx % accentColors.length];
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            {teamMembers.map((member, idx) => {
+              const initials = member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2);
+              const accentColors = ['bg-[#E67817]', 'bg-[#86C127]', 'bg-[#0092DF]', 'bg-[#E67817]'];
+              const accent = accentColors[idx % accentColors.length];
 
-                return (
-                  <div key={member.id} className="flex flex-col items-center text-center space-y-6 group">
-                    {/* Photo Card with Offset Accent Background */}
-                    <div className="relative w-full max-w-[260px]">
-                      <div
-                        className={`absolute inset-0 translate-x-3 translate-y-3 rounded-[20px] ${accent} transition-transform duration-300 group-hover:translate-x-4 group-hover:translate-y-4`}
-                      />
-                      <div className="relative aspect-square w-full rounded-[20px] bg-[#D1D5DB] overflow-hidden border border-slate-200/80 shadow-sm">
-                        {member.avatar_url ? (
-                          <img
-                            src={member.avatar_url}
-                            alt={member.full_name}
-                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-[#CBD5E1]">
-                            <div className="w-16 h-16 rounded-full bg-[#0092DF] text-white flex items-center justify-center text-xl font-black shadow-md">
-                              {initials}
-                            </div>
+              return (
+                <div key={member.id} className="flex flex-col items-center text-center space-y-6 group">
+                  {/* Photo Card with Offset Accent Background */}
+                  <div className="relative w-full max-w-[260px]">
+                    <div
+                      className={`absolute inset-0 translate-x-3 translate-y-3 rounded-[20px] ${accent} transition-transform duration-300 group-hover:translate-x-4 group-hover:translate-y-4`}
+                    />
+                    <div className="relative aspect-square w-full rounded-[20px] bg-[#D1D5DB] overflow-hidden border border-slate-200/80 shadow-sm">
+                      {member.avatar_url ? (
+                        <img
+                          src={member.avatar_url}
+                          alt={member.full_name}
+                          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-[#CBD5E1]">
+                          <div className="w-16 h-16 rounded-full bg-[#0092DF] text-white flex items-center justify-center text-xl font-black shadow-md">
+                            {initials}
                           </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Member Name and Position Only */}
-                    <div className="space-y-1 pt-1">
-                      <h3 className="text-base font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
-                        {member.full_name}
-                      </h3>
-                      <p className="text-xs text-[#E67817] font-bold uppercase tracking-wider">
-                        {member.role_title}
-                      </p>
+                        </div>
+                      )}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="p-8 rounded-[12px] bg-white border border-[#E2E8F0] text-center space-y-2 brand-shadow">
-              <Users className="w-10 h-10 text-[#94A3B8] mx-auto" />
-              <h4 className="font-bold text-[#1E293B]">No Team Members in Database</h4>
-              <p className="text-xs text-[#64748B]">Staff added in the Admin CMS will automatically display here.</p>
-            </div>
-          )}
+
+                  {/* Member Name and Position Only */}
+                  <div className="space-y-1 pt-1">
+                    <h3 className="text-base font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
+                      {member.full_name}
+                    </h3>
+                    <p className="text-xs text-[#E67817] font-bold uppercase tracking-wider">
+                      {member.role_title}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 

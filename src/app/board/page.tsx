@@ -5,7 +5,7 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { PageBanner } from '@/components/common/page-banner';
 import { createClient } from '@/lib/supabase/client';
-import { Award } from 'lucide-react';
+import { officialBoardMembers } from '@/config/theme';
 import type { BoardMember } from '@/types/database';
 
 const accentColors = [
@@ -16,10 +16,10 @@ const accentColors = [
 ];
 
 export default function BoardPage() {
-  const [boardMembers, setBoardMembers] = useState<BoardMember[]>([]);
+  const [boardMembers, setBoardMembers] = useState<BoardMember[]>(officialBoardMembers);
 
   const fetchBoard = async () => {
-    let currentList: BoardMember[] = [];
+    let currentList: BoardMember[] = officialBoardMembers;
 
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_board_members');
@@ -85,59 +85,51 @@ export default function BoardPage() {
             </p>
           </div>
 
-          {boardMembers.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-14 pt-4">
-              {boardMembers.map((member, idx) => {
-                const initials = member.full_name
-                  ? member.full_name.split(' ').map((n) => n[0]).join('').slice(0, 2)
-                  : 'BM';
-                const accent = accentColors[idx % accentColors.length];
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-14 pt-4">
+            {boardMembers.map((member, idx) => {
+              const initials = member.full_name
+                ? member.full_name.split(' ').map((n) => n[0]).join('').slice(0, 2)
+                : 'BM';
+              const accent = accentColors[idx % accentColors.length];
 
-                return (
-                  <div key={member.id} className="flex flex-col items-center text-center space-y-6 group">
-                    <div className="relative w-full max-w-[280px]">
-                      <div
-                        className={`absolute inset-0 translate-x-3.5 translate-y-3.5 rounded-[24px] ${accent} transition-transform duration-300 group-hover:translate-x-4.5 group-hover:translate-y-4.5`}
-                      />
+              return (
+                <div key={member.id} className="flex flex-col items-center text-center space-y-6 group">
+                  <div className="relative w-full max-w-[280px]">
+                    <div
+                      className={`absolute inset-0 translate-x-3.5 translate-y-3.5 rounded-[24px] ${accent} transition-transform duration-300 group-hover:translate-x-4.5 group-hover:translate-y-4.5`}
+                    />
 
-                      <div className="relative aspect-square w-full rounded-[24px] bg-[#CBD5E1] overflow-hidden border border-slate-200 shadow-md">
-                        {member.avatar_url ? (
-                          <img
-                            src={member.avatar_url}
-                            alt={member.full_name}
-                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-[#CBD5E1]">
-                            <div className="w-20 h-20 rounded-full bg-[#0092DF] text-white flex items-center justify-center text-2xl font-black shadow-lg">
-                              {initials}
-                            </div>
+                    <div className="relative aspect-square w-full rounded-[24px] bg-[#CBD5E1] overflow-hidden border border-slate-200 shadow-md">
+                      {member.avatar_url ? (
+                        <img
+                          src={member.avatar_url}
+                          alt={member.full_name}
+                          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-[#CBD5E1]">
+                          <div className="w-20 h-20 rounded-full bg-[#0092DF] text-white flex items-center justify-center text-2xl font-black shadow-lg">
+                            {initials}
                           </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5 pt-2">
-                      <h3 className="text-lg font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
-                        {member.full_name}
-                      </h3>
-                      <p className="text-xs text-[#E67817] font-bold uppercase tracking-wider">
-                        {member.board_role}
-                      </p>
+                        </div>
+                      )}
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="p-16 text-center rounded-[16px] bg-[#F8FAFC] border border-[#E2E8F0] brand-shadow space-y-3">
-              <Award className="w-12 h-12 text-[#94A3B8] mx-auto" />
-              <h3 className="text-lg font-bold text-[#1E293B]">No Board Members Added Yet</h3>
-              <p className="text-xs text-[#64748B]">Board members registered in the Admin CMS will automatically display here.</p>
-            </div>
-          )}
+
+                  <div className="space-y-1.5 pt-2">
+                    <h3 className="text-lg font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
+                      {member.full_name}
+                    </h3>
+                    <p className="text-xs text-[#E67817] font-bold uppercase tracking-wider">
+                      {member.board_role}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </section>
 
