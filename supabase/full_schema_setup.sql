@@ -158,19 +158,118 @@ DROP POLICY IF EXISTS "Admin write media_items" ON public.media_items;
 CREATE POLICY "Admin write media_items" ON public.media_items FOR ALL USING (true);
 
 -- ============================================================================
--- INITIAL SEED RECORDS
+-- INITIAL SEED RECORDS FOR REAL DATABASE EXECUTION IN SUPABASE
 -- ============================================================================
 
-INSERT INTO public.board_members (id, full_name, board_role, bio, email, order_index, is_active)
+INSERT INTO public.team_members (id, full_name, role_title, bio, avatar_url, email, order_index, is_active)
 VALUES
-  ('30000000-0000-0000-0000-000000000001', 'Dr. Hauwa Mustapha', 'Chairman, Board of Trustees', 'Renowned public health strategist and governance advisor.', 'info@e-caph.org', 1, true),
-  ('30000000-0000-0000-0000-000000000002', 'Barr. Usman Danjuma', 'Board Trustee & Legal Counsel', 'Human rights lawyer and legal reform advocate.', 'info@e-caph.org', 2, true),
-  ('30000000-0000-0000-0000-000000000003', 'Prof. Aliyu Bawa', 'Trustee - Health Research & Evaluation', 'Professor of Community Medicine and Epidemiology.', 'info@e-caph.org', 3, true),
-  ('30000000-0000-0000-0000-000000000004', 'Hajiya Amina Bello', 'Trustee - Gender & Peace Cohesion', 'Grassroots peace mediator and women advocate.', 'info@e-caph.org', 4, true)
+  ('team-1', 'Dr. Fatima Abubakar', 'Executive Director & Founder', 'Public health physician with 15+ years leading health systems reform and community interventions in Nigeria.', 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80', 'fatima@e-caph.org', 1, true),
+  ('team-2', 'Ibrahim Sani', 'Director of Programmes', 'Development strategist overseeing adolescent health, civic accountability, and youth economic empowerment initiatives.', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80', 'ibrahim@e-caph.org', 2, true),
+  ('team-3', 'Amina Kabir', 'Head of Public Health & ANC', 'Epidemiologist leading maternal-newborn health tracking and primary health center community advocacy.', 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=600&q=80', 'amina@e-caph.org', 3, true),
+  ('team-4', 'Yusuf Mohammed', 'Lead, Gani da Ido & Governance', 'Social accountability expert coordinating Youth Accountability Champions and community service scorecards.', 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80', 'yusuf@e-caph.org', 4, true)
+ON CONFLICT (id) DO UPDATE SET
+  full_name = EXCLUDED.full_name,
+  role_title = EXCLUDED.role_title,
+  avatar_url = EXCLUDED.avatar_url;
+
+INSERT INTO public.board_members (id, full_name, board_role, bio, avatar_url, email, order_index, is_active)
+VALUES
+  ('board-1', 'Dr. Hauwa Mustapha', 'Chairman, Board of Trustees', 'Renowned public health strategist and governance advisor.', 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80', 'info@e-caph.org', 1, true),
+  ('board-2', 'Barr. Usman Danjuma', 'Board Trustee & Legal Counsel', 'Human rights lawyer and legal reform advocate.', 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=600&q=80', 'info@e-caph.org', 2, true),
+  ('board-3', 'Hajia Maryam Bello', 'Board Trustee & Financial Steward', 'Development finance specialist and women rights advocate.', 'https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&q=80', 'info@e-caph.org', 3, true),
+  ('board-4', 'Prof. Kabir Ahmed', 'Senior Technical Advisor', 'Professor of Community Medicine and Health Policy.', 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=600&q=80', 'info@e-caph.org', 4, true)
 ON CONFLICT (id) DO UPDATE SET
   full_name = EXCLUDED.full_name,
   board_role = EXCLUDED.board_role,
   bio = EXCLUDED.bio;
+
+INSERT INTO public.projects (id, title, slug, summary, description, target_beneficiaries, location, status, featured_image, is_flagship, is_published)
+VALUES
+  (
+    'init-skills-hub',
+    'e-CAPH Skills Hub',
+    'ecaph-skills-hub-women-youth-empowerment',
+    'An economic empowerment initiative designed to equip women and young people with practical vocational and entrepreneurial skills that improve economic opportunities while addressing social vulnerabilities.',
+    'The e-CAPH Skills Hub for women and youth empowerment is an economic empowerment initiative designed to equip women and young people with practical vocational and entrepreneurial skills that improve their economic opportunities while also addressing social vulnerabilities.',
+    'Women, adolescent girls, and unemployed youth.',
+    'Kaduna & Kano, Nigeria',
+    'ongoing',
+    'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
+    true,
+    true
+  ),
+  (
+    'init-gani-da-ido',
+    'Gani da Ido - Muryar Matasa – Idon Al’umma',
+    'gani-da-ido-youth-civic-accountability',
+    'A youth-led civic engagement and social accountability project that amplifies young people’s voices and strengthens community participation in public decision-making.',
+    'The e-CAPH Gani da Ido project enables citizens to monitor public services, budgets, government commitments and development projects through accessible digital and community-based platforms.',
+    'Youth advocates, local ward citizens, and primary health service users.',
+    'Northern Nigeria Wards',
+    'ongoing',
+    'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80',
+    true,
+    true
+  )
+ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title,
+  summary = EXCLUDED.summary;
+
+INSERT INTO public.posts (id, title, slug, summary, content, featured_image, post_type, status, published_at)
+VALUES
+  (
+    'post-1',
+    'e-CAPH Launches Skills Hub for Women and Youth Economic Empowerment',
+    'ecaph-launches-skills-hub-women-youth-empowerment',
+    'Equipping young people and women with high-demand vocational skills, digital technology training, and startup support.',
+    'The e-CAPH Skills Hub equips participants with practical vocational and entrepreneurial skills to foster economic independence.',
+    'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
+    'article',
+    'published',
+    now()
+  ),
+  (
+    'post-2',
+    'Gani da Ido: Youth Accountability Champions Tracking Primary Healthcare Services',
+    'gani-da-ido-youth-accountability-champions-primary-healthcare',
+    'Empowering young leaders to monitor community health centers, budget allocations, and public service delivery.',
+    'Youth Accountability Champions collect community scorecards across primary health centers in northern Nigeria.',
+    'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80',
+    'report',
+    'published',
+    now()
+  )
+ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title,
+  summary = EXCLUDED.summary;
+
+INSERT INTO public.media_items (id, title, caption, media_type, url, thumbnail_url, category, order_index, is_published)
+VALUES
+  (
+    'media-1',
+    'Community Health Advocates Training Workshop in Kaduna',
+    'Over 50 grassroots health champions completed our primary healthcare monitoring toolkit training.',
+    'photo',
+    'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80',
+    NULL,
+    'Community Health',
+    1,
+    true
+  ),
+  (
+    'media-2',
+    'Gani da Ido Project Launch & Youth Dialogue',
+    'Official video coverage of the youth-led social accountability town hall meeting.',
+    'video',
+    'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
+    'Social Accountability',
+    2,
+    true
+  )
+ON CONFLICT (id) DO UPDATE SET
+  title = EXCLUDED.title,
+  caption = EXCLUDED.caption;
 
 INSERT INTO public.download_resources (id, title, slug, description, category, file_url, file_size, downloads_count, is_published)
 VALUES
@@ -180,3 +279,4 @@ ON CONFLICT (id) DO UPDATE SET
   title = EXCLUDED.title,
   slug = EXCLUDED.slug,
   description = EXCLUDED.description;
+

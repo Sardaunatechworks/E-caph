@@ -5,7 +5,6 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { PageBanner } from '@/components/common/page-banner';
 import { createClient } from '@/lib/supabase/client';
-import { officialTeamMembers } from '@/config/theme';
 import type { TeamMember } from '@/types/database';
 
 const accentColors = [
@@ -16,10 +15,10 @@ const accentColors = [
 ];
 
 export default function TeamPage() {
-  const [members, setMembers] = useState<TeamMember[]>(officialTeamMembers);
+  const [members, setMembers] = useState<TeamMember[]>([]);
 
   const fetchTeam = async () => {
-    let currentList: TeamMember[] = officialTeamMembers;
+    let currentList: TeamMember[] = [];
 
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_team_members');

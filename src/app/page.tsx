@@ -10,7 +10,6 @@ import { InitiativeCard } from '@/components/common/initiative-card';
 import { Logo } from '@/components/common/logo';
 import { createClient } from '@/lib/supabase/server';
 import { ArrowRight, Award, Sparkles, BookOpen, Users, HeartPulse, ShieldCheck, TrendingUp } from 'lucide-react';
-import { officialTeamMembers, officialPosts } from '@/config/theme';
 import type { TeamMember, Post, Project, Programme, ImpactStatistic } from '@/types/database';
 
 export default async function HomePage() {
@@ -36,13 +35,6 @@ export default async function HomePage() {
     posts = (resPost.data as Post[] | null) || [];
     teamMembers = (resTeam.data as TeamMember[] | null) || [];
   } catch {}
-
-  if (teamMembers.length === 0) {
-    teamMembers = officialTeamMembers;
-  }
-  if (posts.length === 0) {
-    posts = officialPosts;
-  }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7FAF8] text-[#1E293B] font-sans">

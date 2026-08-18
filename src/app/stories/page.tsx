@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { siteConfig } from '@/config/site';
 import { createClient } from '@/lib/supabase/server';
 import { Calendar, BookOpen, ArrowRight } from 'lucide-react';
-import { officialPosts } from '@/config/theme';
 import type { Post } from '@/types/database';
 
 export const metadata: Metadata = {
@@ -15,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function StoriesPage() {
-  let posts: Post[] = officialPosts;
+  let posts: Post[] = [];
 
   try {
     const supabase = await createClient();

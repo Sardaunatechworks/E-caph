@@ -8,16 +8,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
 import { Camera, Play, ExternalLink, Calendar, FileText } from 'lucide-react';
-import { officialMediaItems } from '@/config/theme';
 import type { MediaItem } from '@/types/database';
 
 export default function MediaPage() {
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>(officialMediaItems);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [selectedMediaPreview, setSelectedMediaPreview] = useState<MediaItem | null>(null);
 
   const fetchMedia = async () => {
-    let currentList: MediaItem[] = officialMediaItems;
+    let currentList: MediaItem[] = [];
 
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_media_items');

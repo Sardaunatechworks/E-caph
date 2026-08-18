@@ -5,7 +5,6 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { PageBanner } from '@/components/common/page-banner';
 import { createClient } from '@/lib/supabase/client';
-import { officialBoardMembers } from '@/config/theme';
 import type { BoardMember } from '@/types/database';
 
 const accentColors = [
@@ -16,10 +15,10 @@ const accentColors = [
 ];
 
 export default function BoardPage() {
-  const [boardMembers, setBoardMembers] = useState<BoardMember[]>(officialBoardMembers);
+  const [boardMembers, setBoardMembers] = useState<BoardMember[]>([]);
 
   const fetchBoard = async () => {
-    let currentList: BoardMember[] = officialBoardMembers;
+    let currentList: BoardMember[] = [];
 
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_board_members');

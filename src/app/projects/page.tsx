@@ -9,16 +9,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { createClient } from '@/lib/supabase/client';
 import { MapPin, FolderKanban, Sparkles, ArrowRight, Search, CheckCircle2 } from 'lucide-react';
-import { officialProjects } from '@/config/theme';
 import type { Project } from '@/types/database';
 
 export default function ProjectsPage() {
-  const [projects, setProjects] = useState<Project[]>(officialProjects);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const fetchProjects = async () => {
-    let currentList: Project[] = officialProjects;
+    let currentList: Project[] = [];
 
     // 1. Check local storage
     if (typeof window !== 'undefined') {
