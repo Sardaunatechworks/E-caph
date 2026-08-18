@@ -12,125 +12,6 @@ import { createClient } from '@/lib/supabase/server';
 import { ArrowRight, Award, Sparkles, BookOpen, Users, HeartPulse, ShieldCheck, TrendingUp } from 'lucide-react';
 import type { TeamMember, Post, Project, Programme, ImpactStatistic } from '@/types/database';
 
-const defaultHomepageTeam: TeamMember[] = [
-  {
-    id: 'team-1',
-    full_name: 'Dr. Fatima Abubakar',
-    role_title: 'Executive Director & Founder',
-    bio: 'Public health physician leading health systems reform and community interventions.',
-    avatar_url: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&w=600&q=80',
-    email: 'fatima@e-caph.org',
-    linkedin_url: null,
-    twitter_url: null,
-    order_index: 1,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'team-2',
-    full_name: 'Ibrahim Sani',
-    role_title: 'Director of Programmes',
-    bio: 'Development strategist overseeing adolescent health and civic accountability initiatives.',
-    avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80',
-    email: 'ibrahim@e-caph.org',
-    linkedin_url: null,
-    twitter_url: null,
-    order_index: 2,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'team-3',
-    full_name: 'Amina Kabir',
-    role_title: 'Head of Public Health & ANC',
-    bio: 'Epidemiologist leading maternal-newborn health tracking and primary health advocacy.',
-    avatar_url: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?auto=format&fit=crop&w=600&q=80',
-    email: 'amina@e-caph.org',
-    linkedin_url: null,
-    twitter_url: null,
-    order_index: 3,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'team-4',
-    full_name: 'Yusuf Mohammed',
-    role_title: 'Lead, Gani da Ido & Governance',
-    bio: 'Social accountability expert coordinating Youth Accountability Champions and service scorecards.',
-    avatar_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80',
-    email: 'yusuf@e-caph.org',
-    linkedin_url: null,
-    twitter_url: null,
-    order_index: 4,
-    is_active: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
-
-const defaultHomepagePosts: Post[] = [
-  {
-    id: 'post-1',
-    author_id: null,
-    category_id: null,
-    programme_id: null,
-    project_id: null,
-    title: 'e-CAPH Launches Skills Hub for Women and Youth Economic Empowerment',
-    slug: 'ecaph-launches-skills-hub-women-youth-empowerment',
-    summary: 'Equipping young people and women with high-demand vocational skills, digital technology training, and startup support.',
-    content: 'The e-CAPH Skills Hub equips participants with practical vocational and entrepreneurial skills to foster economic independence.',
-    featured_image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
-    post_type: 'article',
-    status: 'published',
-    published_at: new Date().toISOString(),
-    views_count: 142,
-    is_featured: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'post-2',
-    author_id: null,
-    category_id: null,
-    programme_id: null,
-    project_id: null,
-    title: 'Gani da Ido: Youth Accountability Champions Tracking Primary Healthcare Services',
-    slug: 'gani-da-ido-youth-accountability-champions-primary-healthcare',
-    summary: 'Empowering young leaders to monitor community health centers, budget allocations, and public service delivery.',
-    content: 'Youth Accountability Champions collect community scorecards across primary health centers in northern Nigeria.',
-    featured_image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80',
-    post_type: 'report',
-    status: 'published',
-    published_at: new Date().toISOString(),
-    views_count: 98,
-    is_featured: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'post-3',
-    author_id: null,
-    category_id: null,
-    programme_id: null,
-    project_id: null,
-    title: 'Digital ANC Tracking: Enhancing Maternal and Child Survival Rates',
-    slug: 'digital-anc-tracking-maternal-child-survival',
-    summary: 'How mobile technology and community health workers are improving 4th-visit antenatal attendance in rural wards.',
-    content: 'Our digital antenatal care tracking tool connects pregnant women with local primary health centers.',
-    featured_image: 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?auto=format&fit=crop&w=800&q=80',
-    post_type: 'impact_story',
-    status: 'published',
-    published_at: new Date().toISOString(),
-    views_count: 210,
-    is_featured: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
-
 export default async function HomePage() {
   let programmes: Programme[] = [];
   let projects: Project[] = [];
@@ -154,13 +35,6 @@ export default async function HomePage() {
     posts = (resPost.data as Post[] | null) || [];
     teamMembers = (resTeam.data as TeamMember[] | null) || [];
   } catch {}
-
-  if (teamMembers.length === 0) {
-    teamMembers = defaultHomepageTeam;
-  }
-  if (posts.length === 0) {
-    posts = defaultHomepagePosts;
-  }
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7FAF8] text-[#1E293B] font-sans">
@@ -279,8 +153,14 @@ export default async function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {thematicFocusAreas.map((area) => (
-              <FocusAreaCard key={area.id} area={area} />
+            {thematicFocusAreas.map((area, idx) => (
+              <FocusAreaCard
+                key={area.slug}
+                slug={area.slug}
+                title={area.title}
+                description={area.description}
+                index={idx}
+              />
             ))}
           </div>
         </div>
@@ -303,7 +183,15 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {flagshipInitiatives.map((initiative) => (
-              <InitiativeCard key={initiative.id} initiative={initiative} />
+              <InitiativeCard
+                key={initiative.id}
+                id={initiative.id}
+                title={initiative.title}
+                category={initiative.category}
+                description={initiative.description}
+                location={initiative.location}
+                isFeatured={initiative.isFeatured}
+              />
             ))}
           </div>
         </div>
@@ -372,29 +260,39 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {posts.map((post) => (
-              <div key={post.id} className="rounded-[12px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F8FAFC] p-6 brand-shadow hover:brand-shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group">
-                <div className="space-y-3">
-                  {post.featured_image && (
-                    <div className="aspect-video w-full rounded-[8px] bg-[#E2E8F0] overflow-hidden border border-slate-200 shadow-xs mb-3">
-                      <img src={post.featured_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
-                    </div>
-                  )}
-                  <Badge variant="secondary" className="text-[11px] uppercase bg-[#E6F4FC] text-[#0092DF] font-bold">
-                    {post.post_type.replace('_', ' ')}
-                  </Badge>
-                  <h3 className="text-lg font-extrabold text-[#0092DF] leading-snug group-hover:text-[#007DC2] transition-colors">
-                    {post.title}
-                  </h3>
-                  <p className="text-xs text-[#64748B] line-clamp-3 leading-relaxed">{post.summary}</p>
+          {posts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {posts.map((post) => (
+                <div key={post.id} className="rounded-[12px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F8FAFC] p-6 brand-shadow hover:brand-shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group">
+                  <div className="space-y-3">
+                    {post.featured_image && (
+                      <div className="aspect-video w-full rounded-[8px] bg-[#E2E8F0] overflow-hidden border border-slate-200 shadow-xs mb-3">
+                        <img src={post.featured_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
+                      </div>
+                    )}
+                    <Badge variant="secondary" className="text-[11px] uppercase bg-[#E6F4FC] text-[#0092DF] font-bold">
+                      {post.post_type.replace('_', ' ')}
+                    </Badge>
+                    <h3 className="text-lg font-extrabold text-[#0092DF] leading-snug group-hover:text-[#007DC2] transition-colors">
+                      {post.title}
+                    </h3>
+                    <p className="text-xs text-[#64748B] line-clamp-3 leading-relaxed">{post.summary}</p>
+                  </div>
+                  <Link href="/stories" className="text-xs font-bold text-[#E67817] hover:underline inline-flex items-center group/link pt-2 border-t border-[#E2E8F0]">
+                    Read Article <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform duration-200 group-hover/link:translate-x-1" />
+                  </Link>
                 </div>
-                <Link href="/stories" className="text-xs font-bold text-[#E67817] hover:underline inline-flex items-center group/link pt-2 border-t border-[#E2E8F0]">
-                  Read Article <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform duration-200 group-hover/link:translate-x-1" />
-                </Link>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="p-8 rounded-[12px] border border-[#E2E8F0] bg-[#F8FAFC] text-center space-y-3 brand-shadow">
+              <BookOpen className="w-10 h-10 text-[#94A3B8] mx-auto" />
+              <h4 className="font-bold text-[#1E293B]">No Published Articles Yet</h4>
+              <p className="text-xs text-[#64748B] max-w-md mx-auto">
+                Articles and field updates published in the Admin CMS will appear here dynamically.
+              </p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -413,51 +311,59 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-            {teamMembers.map((member, idx) => {
-              const initials = member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2);
-              const accentColors = ['bg-[#E67817]', 'bg-[#86C127]', 'bg-[#0092DF]', 'bg-[#E67817]'];
-              const accent = accentColors[idx % accentColors.length];
+          {teamMembers.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+              {teamMembers.map((member, idx) => {
+                const initials = member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2);
+                const accentColors = ['bg-[#E67817]', 'bg-[#86C127]', 'bg-[#0092DF]', 'bg-[#E67817]'];
+                const accent = accentColors[idx % accentColors.length];
 
-              return (
-                <div key={member.id} className="flex flex-col items-center text-center space-y-6 group">
-                  {/* Photo Card with Offset Accent Background */}
-                  <div className="relative w-full max-w-[260px]">
-                    <div
-                      className={`absolute inset-0 translate-x-3 translate-y-3 rounded-[20px] ${accent} transition-transform duration-300 group-hover:translate-x-4 group-hover:translate-y-4`}
-                    />
-                    <div className="relative aspect-square w-full rounded-[20px] bg-[#D1D5DB] overflow-hidden border border-slate-200/80 shadow-sm">
-                      {member.avatar_url ? (
-                        <img
-                          src={member.avatar_url}
-                          alt={member.full_name}
-                          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#CBD5E1]">
-                          <div className="w-16 h-16 rounded-full bg-[#0092DF] text-white flex items-center justify-center text-xl font-black shadow-md">
-                            {initials}
+                return (
+                  <div key={member.id} className="flex flex-col items-center text-center space-y-6 group">
+                    {/* Photo Card with Offset Accent Background */}
+                    <div className="relative w-full max-w-[260px]">
+                      <div
+                        className={`absolute inset-0 translate-x-3 translate-y-3 rounded-[20px] ${accent} transition-transform duration-300 group-hover:translate-x-4 group-hover:translate-y-4`}
+                      />
+                      <div className="relative aspect-square w-full rounded-[20px] bg-[#D1D5DB] overflow-hidden border border-slate-200/80 shadow-sm">
+                        {member.avatar_url ? (
+                          <img
+                            src={member.avatar_url}
+                            alt={member.full_name}
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-[#CBD5E1]">
+                            <div className="w-16 h-16 rounded-full bg-[#0092DF] text-white flex items-center justify-center text-xl font-black shadow-md">
+                              {initials}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Member Name and Position Only */}
+                    <div className="space-y-1 pt-1">
+                      <h3 className="text-base font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
+                        {member.full_name}
+                      </h3>
+                      <p className="text-xs text-[#E67817] font-bold uppercase tracking-wider">
+                        {member.role_title}
+                      </p>
                     </div>
                   </div>
-
-                  {/* Member Name and Position Only */}
-                  <div className="space-y-1 pt-1">
-                    <h3 className="text-base font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
-                      {member.full_name}
-                    </h3>
-                    <p className="text-xs text-[#E67817] font-bold uppercase tracking-wider">
-                      {member.role_title}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="p-8 rounded-[12px] bg-white border border-[#E2E8F0] text-center space-y-2 brand-shadow">
+              <Users className="w-10 h-10 text-[#94A3B8] mx-auto" />
+              <h4 className="font-bold text-[#1E293B]">No Team Members in Database</h4>
+              <p className="text-xs text-[#64748B]">Staff added in the Admin CMS will automatically display here.</p>
+            </div>
+          )}
         </div>
       </section>
 

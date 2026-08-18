@@ -7,61 +7,16 @@ import { PageBanner } from '@/components/common/page-banner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { createClient } from '@/lib/supabase/client';
-import { Camera, Video, FileText, Download, Play, ExternalLink, Calendar } from 'lucide-react';
+import { Camera, Video, FileText, Play, ExternalLink, Calendar } from 'lucide-react';
 import type { MediaItem } from '@/types/database';
 
-const defaultMediaItems: MediaItem[] = [
-  {
-    id: 'media-1',
-    title: 'Community Health Advocates Training Workshop in Kaduna',
-    caption: 'Over 50 grassroots health champions completed our primary healthcare monitoring toolkit training.',
-    media_type: 'photo',
-    url: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80',
-    thumbnail_url: null,
-    category: 'Community Health',
-    order_index: 1,
-    is_published: true,
-    published_at: new Date().toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'media-2',
-    title: 'Gani da Ido Project Launch & Youth Dialogue',
-    caption: 'Official video coverage of the youth-led social accountability town hall meeting.',
-    media_type: 'video',
-    url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-    thumbnail_url: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80',
-    category: 'Social Accountability',
-    order_index: 2,
-    is_published: true,
-    published_at: new Date().toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'media-3',
-    title: 'Press Statement: Call for Accelerated Implementation of Primary Healthcare Reforms',
-    caption: 'e-CAPH issues official press statement advocating transparent budget allocation for maternal-newborn health centers.',
-    media_type: 'press_release',
-    url: 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/web/compressed.tracemonkey-pldi-09.pdf',
-    thumbnail_url: null,
-    category: 'Policy & Advocacy',
-    order_index: 3,
-    is_published: true,
-    published_at: new Date().toISOString(),
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-];
-
 export default function MediaPage() {
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>(defaultMediaItems);
+  const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [selectedMediaPreview, setSelectedMediaPreview] = useState<MediaItem | null>(null);
 
   const fetchMedia = async () => {
-    let currentList = defaultMediaItems;
+    let currentList: MediaItem[] = [];
 
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_media_items');
@@ -255,8 +210,8 @@ export default function MediaPage() {
           ) : (
             <div className="p-16 text-center rounded-[16px] bg-[#F8FAFC] border border-[#E2E8F0] brand-shadow space-y-3">
               <Camera className="w-12 h-12 text-[#94A3B8] mx-auto" />
-              <h3 className="text-lg font-bold text-[#1E293B]">No Media Items Available</h3>
-              <p className="text-xs text-[#64748B]">Media items are currently being loaded into our system.</p>
+              <h3 className="text-lg font-bold text-[#1E293B]">No Media Items Found in Database</h3>
+              <p className="text-xs text-[#64748B]">Photos and media published in the Admin CMS will automatically appear here.</p>
             </div>
           )}
         </div>
