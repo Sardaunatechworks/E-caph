@@ -150,6 +150,31 @@ if (fs.existsSync(chunksDir)) {
   fs.writeFileSync(path.join(chunksDir, '2lt03smjhj35o.css'), '/* fallback */');
 }
 
+// 1c. Create dual font aliases (.p. and non-.p.) to prevent font 404s for any cached browser preloads
+const mediaDir = path.join('out', '_next', 'static', 'media');
+if (fs.existsSync(mediaDir)) {
+  const mediaFiles = fs.readdirSync(mediaDir);
+  for (const file of mediaFiles) {
+    if (file.endsWith('.woff2')) {
+      if (file.includes('-s.p.')) {
+        const altFile = file.replace('-s.p.', '-s.');
+        const altPath = path.join(mediaDir, altFile);
+        if (!fs.existsSync(altPath)) {
+          fs.copyFileSync(path.join(mediaDir, file), altPath);
+          console.log(`Created font alias: ${altFile} <- ${file}`);
+        }
+      } else if (file.includes('-s.')) {
+        const altFile = file.replace('-s.', '-s.p.');
+        const altPath = path.join(mediaDir, altFile);
+        if (!fs.existsSync(altPath)) {
+          fs.copyFileSync(path.join(mediaDir, file), altPath);
+          console.log(`Created font alias: ${altFile} <- ${file}`);
+        }
+      }
+    }
+  }
+}
+
 // 2. Create flat alias files for Next.js App Router RSC prefetch queries
 function createRscAliases(dir) {
   const items = fs.readdirSync(dir);

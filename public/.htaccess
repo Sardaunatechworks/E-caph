@@ -44,6 +44,13 @@ RewriteCond %{HTTPS} off
 RewriteCond %{HTTP:X-Forwarded-Proto} !https
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# 4b. Font compatibility alias (safely remaps .p. woff2 to non-.p. or vice versa if file is missing)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^_next/static/media/(.+)-s\.p\.(.+\.woff2)$ _next/static/media/$1-s.$2 [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^_next/static/media/(.+)-s\.(.+\.woff2)$ _next/static/media/$1-s.p.$2 [L]
+
 # 5. NEVER rewrite static Next.js assets, CSS, JS, fonts, media
 RewriteRule ^_next/(.*)$ _next/$1 [L]
 RewriteCond %{REQUEST_URI} \.(css|js|mjs|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|pdf|webp|txt)$ [NC]
