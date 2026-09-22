@@ -51,6 +51,13 @@ RewriteRule ^_next/static/media/(.+)-s\.p\.(.+\.woff2)$ _next/static/media/$1-s.
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^_next/static/media/(.+)-s\.(.+\.woff2)$ _next/static/media/$1-s.p.$2 [L]
 
+# 4c. Chunk compatibility fallback (prevents 404 & ChunkLoadError for any missing chunk from older builds)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^_next/static/chunks/(.+)\.js$ _next/static/chunks/fallback.js [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^_next/static/chunks/(.+)\.css$ _next/static/chunks/fallback.css [L]
+
 # 5. NEVER rewrite static Next.js assets, CSS, JS, fonts, media
 RewriteRule ^_next/(.*)$ _next/$1 [L]
 RewriteCond %{REQUEST_URI} \.(css|js|mjs|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|pdf|webp|txt)$ [NC]

@@ -140,14 +140,20 @@ if (fs.existsSync('public/.htaccess')) {
   fs.copyFileSync('public/.htaccess', 'out/.htaccess');
 }
 
-// 1b. Write legacy chunk fallbacks to prevent 404s for any client with cached references
+// 1b. Write chunk fallbacks to prevent 404s and ChunkLoadErrors for any client with cached references
 const chunksDir = path.join('out', '_next', 'static', 'chunks');
 if (fs.existsSync(chunksDir)) {
-  fs.writeFileSync(
-    path.join(chunksDir, '2puv0rx1z5p61.js'),
-    '(globalThis.__turbopack_load__=globalThis.__turbopack_load__||[]).push(["static/chunks/2puv0rx1z5p61.js",{64893:(e)=>{e.s({});}}]);'
-  );
-  fs.writeFileSync(path.join(chunksDir, '2lt03smjhj35o.css'), '/* fallback */');
+  const universalFallbackJs = '(function(){try{var c=(typeof document!=="undefined"&&document.currentScript)?document.currentScript:null;(globalThis.TURBOPACK=globalThis.TURBOPACK||[]).push([c,{}]);}catch(e){}try{(globalThis.__turbopack_load__=globalThis.__turbopack_load__||[]).push(["fallback",{64893:function(e){if(e&&e.s)e.s({});}}]);}catch(e){}})();';
+  const universalFallbackCss = '/* fallback */';
+
+  fs.writeFileSync(path.join(chunksDir, 'fallback.js'), universalFallbackJs);
+  fs.writeFileSync(path.join(chunksDir, 'fallback.css'), universalFallbackCss);
+
+  // Specific legacy hashes reported by active browser sessions
+  fs.writeFileSync(path.join(chunksDir, '1gc-b9suqwef4.js'), universalFallbackJs);
+  fs.writeFileSync(path.join(chunksDir, '0nxnqtqj_w2ru.css'), universalFallbackCss);
+  fs.writeFileSync(path.join(chunksDir, '2puv0rx1z5p61.js'), universalFallbackJs);
+  fs.writeFileSync(path.join(chunksDir, '2lt03smjhj35o.css'), universalFallbackCss);
 }
 
 // 1c. Create dual font aliases (.p. and non-.p.) to prevent font 404s for any cached browser preloads
