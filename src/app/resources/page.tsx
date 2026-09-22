@@ -10,62 +10,69 @@ import { Input } from '@/components/ui/input';
 import { PDFViewerModal } from '@/components/common/pdf-viewer-modal';
 import { siteConfig } from '@/config/site';
 import { createClient } from '@/lib/supabase/client';
-import { FileText, Download, Eye, Search, Filter, BookOpen } from 'lucide-react';
+import { FileText, Download, Eye, Search, Filter, BookOpen, Loader2 } from 'lucide-react';
 import type { DownloadResource } from '@/types/database';
 
 const categories = ['All Categories', 'Annual Report', 'Policy Brief', 'Research Paper', 'Tool/Guide'];
 
 export default function ResourcesPage() {
   const [resources, setResources] = useState<DownloadResource[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [selectedResourceForView, setSelectedResourceForView] = useState<DownloadResource | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
 
   const fetchResources = async () => {
-    let currentList: DownloadResource[] = [];
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from('download_resources')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
 
+      if (!error && data && data.length > 0) {
+        setResources(data as DownloadResource[]);
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('ecaph_download_resources', JSON.stringify(data));
+        }
+        setLoading(false);
+        return;
+      }
+    } catch (err) {
+      console.warn('Database fetch notice:', err);
+    }
+
+    // Fallback to local storage if offline or DB empty
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_download_resources');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            currentList = parsed.filter((r: DownloadResource) => r.is_published !== false);
+            setResources(parsed.filter((r) => r.is_published !== false));
           }
         } catch {}
       }
     }
-
-    try {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from('download_resources')
-        .select('*')
-        .eq('is_published', true)
-        .order('created_at', { ascending: false });
-
-      if (data && data.length > 0) {
-        currentList = data as DownloadResource[];
-      }
-    } catch {}
-
-    setResources(currentList);
+    setLoading(false);
   };
 
   useEffect(() => {
     fetchResources();
 
     const handleSync = () => fetchResources();
-    window.addEventListener('storage', handleSync);
-    window.addEventListener('ecaph_resources_updated', handleSync);
-
-    const interval = setInterval(fetchResources, 10000);
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', handleSync);
+      window.addEventListener('ecaph_resources_updated', handleSync);
+    }
 
     return () => {
-      window.removeEventListener('storage', handleSync);
-      window.removeEventListener('ecaph_resources_updated', handleSync);
-      clearInterval(interval);
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('storage', handleSync);
+        window.removeEventListener('ecaph_resources_updated', handleSync);
+      }
     };
   }, []);
 
@@ -141,7 +148,12 @@ export default function ResourcesPage() {
           </div>
 
           {/* Resources Grid */}
-          {filteredResources.length > 0 ? (
+          {loading ? (
+            <div className="text-center py-20 space-y-4 bg-[#F8FAFC] rounded-[12px] border border-[#E2E8F0]">
+              <Loader2 className="w-10 h-10 text-[#0092DF] animate-spin mx-auto" />
+              <p className="text-xs font-semibold text-[#64748B]">Loading resources &amp; publications...</p>
+            </div>
+          ) : filteredResources.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {filteredResources.map((res) => (
                 <div
@@ -154,7 +166,7 @@ export default function ResourcesPage() {
                         {res.category}
                       </Badge>
                       <span className="text-xs text-[#94A3B8] font-medium">
-                        {res.file_size || 'PDF Document'} • {res.downloads_count} Downloads
+                        {res.file_size || 'PDF Document'} • {res.downloads_count || 0} Downloads
                       </span>
                     </div>
 

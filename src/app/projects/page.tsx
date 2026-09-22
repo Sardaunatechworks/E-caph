@@ -16,53 +16,23 @@ export default function ProjectsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
-  const fetchProjects = async () => {
-    let currentList: Project[] = [];
-
-    // 1. Check local storage
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('ecaph_projects');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            currentList = parsed.filter((p: Project) => p.is_published !== false);
-          }
-        } catch {}
-      }
-    }
-
-    // 2. Query Supabase Client
-    try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('projects')
-        .select('*')
-        .eq('is_published', true)
-        .order('created_at', { ascending: false });
-
-      if (!error && data && data.length > 0) {
-        currentList = data as Project[];
-      }
-    } catch {}
-
-    setProjects(currentList);
-  };
-
   useEffect(() => {
-    fetchProjects();
+    const fetchProjects = async () => {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('projects')
+          .select('*')
+          .eq('is_published', true)
+          .order('created_at', { ascending: false });
 
-    const handleSync = () => fetchProjects();
-    window.addEventListener('storage', handleSync);
-    window.addEventListener('ecaph_projects_updated', handleSync);
-
-    const interval = setInterval(fetchProjects, 10000);
-
-    return () => {
-      window.removeEventListener('storage', handleSync);
-      window.removeEventListener('ecaph_projects_updated', handleSync);
-      clearInterval(interval);
+        if (!error && data) {
+          setProjects(data as Project[]);
+        }
+      } catch {}
     };
+
+    fetchProjects();
   }, []);
 
   const filteredProjects = projects.filter((project) => {

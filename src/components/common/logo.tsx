@@ -19,7 +19,7 @@ export function Logo({ variant = 'default', className = '', showText = true }: L
     use_custom_image: false,
     image_url: '/logo.png',
     brand_title: 'e-CAPH',
-    registration_number: 'RC:144280',
+    registration_number: 'CAC/IT/NO 144280',
   });
 
   const loadConfig = async () => {

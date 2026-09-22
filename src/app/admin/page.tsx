@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AdminHeader } from '@/components/admin/admin-header';
 import {
@@ -7,7 +10,7 @@ import {
 } from '@/components/admin/dashboard-charts';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
 import {
   Layers,
   FolderKanban,
@@ -26,115 +29,49 @@ import {
   CheckCircle2,
   AlertTriangle,
   Megaphone,
+  Inbox,
 } from 'lucide-react';
 import type { ContactMessage, Post } from '@/types/database';
 
-export default async function AdminDashboardPage() {
-  let progCount = 6;
-  let projCount = 18;
-  let postCount = 24;
-  let oppCount = 4;
-  let msgCount = 195;
-  let recentMessages: ContactMessage[] = [];
-  let recentPosts: Post[] = [];
+export default function AdminDashboardPage() {
+  const [progCount, setProgCount] = useState(0);
+  const [projCount, setProjCount] = useState(0);
+  const [postCount, setPostCount] = useState(0);
+  const [oppCount, setOppCount] = useState(0);
+  const [recentMessages, setRecentMessages] = useState<ContactMessage[]>([]);
+  const [recentPosts, setRecentPosts] = useState<Post[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
-  try {
-    const supabase = await createClient();
-    const [resProg, resProj, resPost, resOpp, resMsg, resP] = await Promise.all([
-      supabase.from('programmes').select('*', { count: 'exact', head: true }),
-      supabase.from('projects').select('*', { count: 'exact', head: true }),
-      supabase.from('posts').select('*', { count: 'exact', head: true }),
-      supabase.from('opportunities').select('*', { count: 'exact', head: true }),
-      supabase.from('contact_messages').select('*').order('created_at', { ascending: false }).limit(4),
-      supabase.from('posts').select('*').order('created_at', { ascending: false }).limit(4),
-    ]);
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const supabase = createClient();
+        const [resProg, resProj, resPost, resOpp, resMsg, resP] = await Promise.all([
+          supabase.from('programmes').select('*', { count: 'exact', head: true }),
+          supabase.from('projects').select('*', { count: 'exact', head: true }),
+          supabase.from('posts').select('*', { count: 'exact', head: true }),
+          supabase.from('opportunities').select('*', { count: 'exact', head: true }),
+          supabase.from('contact_messages').select('*').order('created_at', { ascending: false }).limit(4),
+          supabase.from('posts').select('*').order('created_at', { ascending: false }).limit(4),
+        ]);
 
-    if (resProg.count) progCount = resProg.count;
-    if (resProj.count) projCount = resProj.count;
-    if (resPost.count) postCount = resPost.count;
-    if (resOpp.count) oppCount = resOpp.count;
-    if (resMsg.data && resMsg.data.length > 0) recentMessages = resMsg.data as ContactMessage[];
-    if (resP.data && resP.data.length > 0) recentPosts = resP.data as Post[];
-  } catch {
-    // Fallback data if offline
-  }
+        if (resProg.count != null) setProgCount(resProg.count);
+        if (resProj.count != null) setProjCount(resProj.count);
+        if (resPost.count != null) setPostCount(resPost.count);
+        if (resOpp.count != null) setOppCount(resOpp.count);
+        if (resMsg.data) setRecentMessages(resMsg.data as ContactMessage[]);
+        if (resP.data) setRecentPosts(resP.data as Post[]);
+      } catch {}
+      setLoaded(true);
+    };
 
-  // Fallback demo data if DB is empty
-  if (recentMessages.length === 0) {
-    recentMessages = [
-      {
-        id: '1',
-        name: 'Amina Bello',
-        email: 'amina.bello@healthgov.ng',
-        phone: '+234 803 123 4567',
-        organization: 'Ministry of Health, Kano',
-        subject: 'Maternal Health Partnership Proposal',
-        inquiry_type: 'partnership',
-        message: 'Requesting formal collaboration on community health worker training in Kano State.',
-        created_at: new Date().toISOString(),
-        is_read: false,
-        replied_at: null,
-      },
-      {
-        id: '2',
-        name: 'Ibrahim Garba',
-        email: 'igarba@youthpeace.org',
-        phone: '+234 802 987 6543',
-        organization: 'Youth Peace Network',
-        subject: 'Youth Peace Ambassador Training',
-        inquiry_type: 'volunteer',
-        message: 'Submitting volunteer applications for the upcoming peace building retreat.',
-        created_at: new Date().toISOString(),
-        is_read: true,
-        replied_at: null,
-      },
-    ];
-  }
-
-  if (recentPosts.length === 0) {
-    recentPosts = [
-      {
-        id: '1',
-        title: 'Over 120,000 Beneficiaries Reached in 2026 Northern Nigeria Health Rally',
-        slug: 'northern-nigeria-health-rally-2026',
-        summary: 'e-CAPH field officers completed rural healthcare distribution across 14 local councils.',
-        content: '',
-        featured_image: '',
-        post_type: 'impact_story',
-        published_at: new Date().toISOString(),
-        author_id: null,
-        category_id: null,
-        programme_id: null,
-        project_id: null,
-        status: 'published',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-      {
-        id: '2',
-        title: 'Youth Conflict Resolution Workshop Conducted in Kaduna',
-        slug: 'youth-conflict-resolution-kaduna',
-        summary: 'Empowering local community leaders to resolve grassroots disputes peacefully.',
-        content: '',
-        featured_image: '',
-        post_type: 'news',
-        published_at: new Date().toISOString(),
-        author_id: null,
-        category_id: null,
-        programme_id: null,
-        project_id: null,
-        status: 'published',
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      },
-    ];
-  }
+    fetchDashboardData();
+  }, []);
 
   const metrics = [
     {
       label: 'Core Programmes',
       value: progCount,
-      trend: '+12% YoY',
       icon: Layers,
       href: '/admin/programmes',
       color: 'text-[#0092DF]',
@@ -143,7 +80,6 @@ export default async function AdminDashboardPage() {
     {
       label: 'Active Projects',
       value: projCount,
-      trend: '+18.4% Impact',
       icon: FolderKanban,
       href: '/admin/projects',
       color: 'text-[#86C127]',
@@ -152,28 +88,19 @@ export default async function AdminDashboardPage() {
     {
       label: 'Published Stories',
       value: postCount,
-      trend: '+24.5k Views',
       icon: FileText,
       href: '/admin/posts',
       color: 'text-[#0092DF]',
       bg: 'bg-[#E6F4FC]',
     },
     {
-      label: 'Public Inquiries',
-      value: msgCount,
-      trend: '94.8% Responded',
-      icon: Mail,
-      href: '/admin/messages',
+      label: 'Opportunities',
+      value: oppCount,
+      icon: Briefcase,
+      href: '/admin/opportunities',
       color: 'text-[#E67817]',
       bg: 'bg-[#FEF3EA]',
     },
-  ];
-
-  const auditLogs = [
-    { id: 1, action: 'User Session Authenticated', detail: 'Super Admin logged in from IP 197.210.xx', time: '10 mins ago', type: 'security' },
-    { id: 2, action: 'Story Post Published', detail: 'Published "Youth Conflict Resolution Workshop"', time: '45 mins ago', type: 'content' },
-    { id: 3, action: 'Database Backup Completed', detail: 'Automated snapshot saved (24.8 GB)', time: '2 hours ago', type: 'system' },
-    { id: 4, action: 'Inquiry Marked Resolved', detail: 'Processed partnership inquiry #1042', time: '3 hours ago', type: 'support' },
   ];
 
   return (
@@ -214,8 +141,6 @@ export default async function AdminDashboardPage() {
           </div>
         </div>
 
-
-
         {/* Primary Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {metrics.map((m, idx) => {
@@ -230,9 +155,6 @@ export default async function AdminDashboardPage() {
                   <div className={`w-10 h-10 rounded-lg ${m.bg} flex items-center justify-center`}>
                     <Icon className={`w-5 h-5 ${m.color}`} />
                   </div>
-                  <span className="text-[10px] font-black text-[#86C127] bg-[#F3F9E9] px-2 py-0.5 rounded-full">
-                    {m.trend}
-                  </span>
                 </div>
                 <div>
                   <div className="text-2xl sm:text-3xl font-black text-[#1E293B]">{m.value}</div>
@@ -255,9 +177,6 @@ export default async function AdminDashboardPage() {
                 </h3>
                 <p className="text-xs text-slate-500">Monthly community members reached across northern Nigeria.</p>
               </div>
-              <Badge variant="outline" className="text-[10px] border-[#0092DF] text-[#0092DF]">
-                2026 Trend
-              </Badge>
             </div>
             <BeneficiariesReachChart />
           </div>
@@ -297,18 +216,25 @@ export default async function AdminDashboardPage() {
             </div>
 
             <div className="space-y-3">
-              {recentMessages.map((msg) => (
-                <div key={msg.id} className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#0092DF]">{msg.name}</span>
-                    <Badge variant="outline" className="text-[10px] capitalize">
-                      {msg.inquiry_type}
-                    </Badge>
-                  </div>
-                  <p className="text-xs font-bold text-[#1E293B]">{msg.subject}</p>
-                  <p className="text-[11px] text-slate-600 line-clamp-2">{msg.message}</p>
+              {recentMessages.length === 0 ? (
+                <div className="p-8 text-center space-y-2">
+                  <Inbox className="w-8 h-8 text-slate-300 mx-auto" />
+                  <p className="text-xs text-slate-400 font-medium">No inquiries yet</p>
                 </div>
-              ))}
+              ) : (
+                recentMessages.map((msg) => (
+                  <div key={msg.id} className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#0092DF]">{msg.name}</span>
+                      <Badge variant="outline" className="text-[10px] capitalize">
+                        {msg.inquiry_type}
+                      </Badge>
+                    </div>
+                    <p className="text-xs font-bold text-[#1E293B]">{msg.subject}</p>
+                    <p className="text-[11px] text-slate-600 line-clamp-2">{msg.message}</p>
+                  </div>
+                ))
+              )}
             </div>
           </div>
 
@@ -325,45 +251,28 @@ export default async function AdminDashboardPage() {
             </div>
 
             <div className="space-y-3">
-              {recentPosts.map((post) => (
-                <div key={post.id} className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-[#1E293B] line-clamp-1">{post.title}</span>
-                    <Badge variant={post.status === 'published' ? 'published' : 'draft'}>
-                      {post.status}
-                    </Badge>
+              {recentPosts.length === 0 ? (
+                <div className="p-8 text-center space-y-2">
+                  <FileText className="w-8 h-8 text-slate-300 mx-auto" />
+                  <p className="text-xs text-slate-400 font-medium">No posts yet — create your first article!</p>
+                </div>
+              ) : (
+                recentPosts.map((post) => (
+                  <div key={post.id} className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-[#1E293B] line-clamp-1">{post.title}</span>
+                      <Badge variant={post.status === 'published' ? 'published' : 'draft'}>
+                        {post.status}
+                      </Badge>
+                    </div>
+                    <p className="text-[11px] text-slate-600 line-clamp-2">{post.summary}</p>
                   </div>
-                  <p className="text-[11px] text-slate-600 line-clamp-2">{post.summary}</p>
-                </div>
-              ))}
+                ))
+              )}
             </div>
-          </div>
-        </div>
-
-        {/* Audit Trail & Live Activity Log */}
-        <div className="p-6 rounded-xl bg-white border border-[#E2E8F0] shadow-xs space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div className="flex items-center gap-2">
-              <Activity className="w-4 h-4 text-[#E67817]" />
-              <h3 className="font-bold text-[#1E293B] text-base">System Audit Trail &amp; Activity Log</h3>
-            </div>
-            <span className="text-[11px] text-slate-400 font-semibold">Real-Time Security Logging</span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {auditLogs.map((log) => (
-              <div key={log.id} className="p-3.5 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#0092DF]">{log.action}</span>
-                  <span className="text-[10px] text-slate-400">{log.time}</span>
-                </div>
-                <p className="text-[11px] text-slate-600">{log.detail}</p>
-              </div>
-            ))}
           </div>
         </div>
       </main>
     </div>
   );
 }
-

@@ -13,6 +13,7 @@ const manrope = Manrope({
   subsets: ['latin'],
   variable: '--font-manrope',
   display: 'swap',
+  preload: false,
 });
 
 export const metadata: Metadata = {
@@ -48,6 +49,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${inter.variable} ${manrope.variable} scroll-smooth`}>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.addEventListener('error', function(e) {
+                var msg = (e && e.message) || '';
+                if (msg.indexOf('ChunkLoadError') !== -1 || msg.indexOf('Loading chunk') !== -1 || msg.indexOf('Failed to load chunk') !== -1) {
+                  if (!sessionStorage.getItem('chunk_reload_retry')) {
+                    sessionStorage.setItem('chunk_reload_retry', 'true');
+                    window.location.reload();
+                  }
+                }
+              });
+              window.addEventListener('load', function() {
+                sessionStorage.removeItem('chunk_reload_retry');
+              });
+            `,
+          }}
+        />
+      </head>
       <body className="font-sans bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col selection:bg-[#176B4D] selection:text-white">
         {children}
       </body>

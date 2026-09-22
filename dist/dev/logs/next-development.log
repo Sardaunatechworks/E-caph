@@ -1,4 +1,0 @@
-{"timestamp":"00:00:10.049","source":"Server","level":"ERROR","message":"⨯ Middleware cannot be used with \"output: export\". See more info here: https://nextjs.org/docs/advanced-features/static-html-export"}
-{"timestamp":"00:00:10.114","source":"Server","level":"ERROR","message":"⨯ Middleware cannot be used with \"output: export\". See more info here: https://nextjs.org/docs/advanced-features/static-html-export"}
-{"timestamp":"00:00:10.256","source":"Server","level":"ERROR","message":"⨯ Middleware cannot be used with \"output: export\". See more info here: https://nextjs.org/docs/advanced-features/static-html-export"}
-{"timestamp":"00:00:11.555","source":"Server","level":"LOG","message":""}

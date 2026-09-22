@@ -15,9 +15,23 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  return siteConfig.nav.footer.programmes.map((p) => ({
-    slug: p.href.replace('/programmes/', ''),
-  }));
+  const staticSlugs = siteConfig.nav.footer.programmes.map((p) =>
+    p.href.replace('/programmes/', '').replace(/\/$/, '')
+  );
+
+  try {
+    const supabase = await createClient();
+    const { data } = await supabase.from('programmes').select('slug').eq('is_published', true);
+    if (data && data.length > 0) {
+      const dbSlugs = data.map((p) => p.slug.replace(/\/$/, '')).filter(Boolean);
+      const combined = Array.from(new Set([...staticSlugs, ...dbSlugs]));
+      return combined.map((slug) => ({ slug }));
+    }
+  } catch {
+    // Fallback
+  }
+
+  return staticSlugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

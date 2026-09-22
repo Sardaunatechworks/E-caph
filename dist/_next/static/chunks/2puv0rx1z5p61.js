@@ -1,0 +1,1 @@
+(globalThis.__turbopack_load__=globalThis.__turbopack_load__||[]).push(["static/chunks/2puv0rx1z5p61.js",{64893:(e)=>{e.s({});}}]);

@@ -1,26 +1,82 @@
 # ============================================================================
-# e-CAPH System Apache Configuration (Optimized for Namecheap cPanel)
+# e-CAPH System Apache Configuration (Optimized for cPanel / Apache)
 # ============================================================================
 
-Options -MultiViews
+# 1. Correct MIME Types (Prevents CSS/JS MIME-type blocking)
+<IfModule mod_mime.c>
+  AddType text/css .css
+  AddType application/javascript .js .mjs
+  AddType application/json .json
+  AddType text/plain .txt
+  AddType image/svg+xml .svg .svgz
+  AddType font/woff2 .woff2
+  AddType font/woff .woff
+  AddType application/pdf .pdf
+</IfModule>
+
+# 2. Enable Gzip Compression for Fast Loading
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json image/svg+xml
+</IfModule>
+
+# 2b. Cache-Control Headers (Ensures instant updates after deployment)
+<IfModule mod_headers.c>
+  # Never cache HTML files (ensures browsers always fetch fresh chunk references)
+  <FilesMatch "\.(html|htm)$">
+    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Pragma "no-cache"
+    Header set Expires 0
+  </FilesMatch>
+
+  # Cache immutable hashed assets for high performance
+  <FilesMatch "\.(js|css|woff2|woff|ttf|png|jpg|jpeg|gif|svg|webp|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+# 3. Disable Directory Browsing & MultiViews
+Options -Indexes -MultiViews
 RewriteEngine On
+RewriteBase /
 
-# 1. Force HTTPS Security
+# 4. Force HTTPS Security
 RewriteCond %{HTTPS} off
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# 2. Serve static files & directories directly if they exist
+# 5. NEVER rewrite static Next.js assets, CSS, JS, fonts, media
+RewriteRule ^_next/(.*)$ _next/$1 [L]
+RewriteCond %{REQUEST_URI} \.(css|js|mjs|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|pdf|webp|txt)$ [NC]
+RewriteRule ^ - [L]
+
+# 6. Serve existing files & directories directly
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# 3. Rewrite Clean Routes to Subdirectory index.html (e.g., /admin -> /admin/index.html)
-RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
-RewriteRule ^(.*)/?$ $1/index.html [L]
+# 7. Clean URLs: rewrite /page/ to /page/index.html if exists
+RewriteCond %{REQUEST_FILENAME}/index.html -f
+RewriteRule ^(.*)$ $1/index.html [L]
 
-# 4. Rewrite Clean Routes to .html files (e.g., /about -> /about.html)
-RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+# 8. Clean URLs: rewrite /page to /page/index.html if directory/index.html exists
+RewriteCond %{REQUEST_URI} !/$
+RewriteCond %{REQUEST_FILENAME}/index.html -f
+RewriteRule ^(.*)$ $1/index.html [L]
+
+# 9. Clean URLs: rewrite /page to /page.html if exists
+RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^(.*)$ $1.html [L]
 
-# 5. Handle Custom 404 Page
+# 9b. Dynamic Blog/Stories/Publications fallback:
+# If a /blog/<slug> URL is requested and doesn't exist statically on disk,
+# rewrite internally to blog/view/index.html so the client can load the post dynamically
+RewriteCond %{REQUEST_URI} ^/blog/ [NC]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}/index.html !-f
+RewriteRule ^blog/(.+)$ blog/view/index.html [L]
+
+# 10. Fallback 404
 ErrorDocument 404 /404/index.html
+
+

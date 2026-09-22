@@ -14,53 +14,35 @@ import type { Post } from '@/types/database';
 export default function BlogPage() {
   const [posts, setPosts] = useState<Post[]>([]);
 
-  const fetchPosts = async () => {
-    let currentList: Post[] = [];
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('posts')
+          .select('*')
+          .eq('status', 'published')
+          .order('published_at', { ascending: false });
 
-    // 1. Read from localStorage
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('ecaph_posts');
-      if (saved) {
+        if (!error && data && data.length > 0) {
+          setPosts(data as Post[]);
+          return;
+        }
+      } catch {}
+
+      // Fallback to local storage if offline or DB query returns empty
+      if (typeof window !== 'undefined') {
         try {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) {
-            currentList = parsed.filter((p: Post) => p.status !== 'draft');
+          const saved = localStorage.getItem('ecaph_posts');
+          if (saved) {
+            const list: Post[] = JSON.parse(saved);
+            setPosts(list.filter((p) => p.status === 'published'));
           }
         } catch {}
       }
-    }
-
-    // 2. Query Supabase Client
-    try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('posts')
-        .select('*')
-        .eq('status', 'published')
-        .order('published_at', { ascending: false });
-
-      if (!error && data && data.length > 0) {
-        currentList = data as Post[];
-      }
-    } catch {}
-
-    setPosts(currentList);
-  };
-
-  useEffect(() => {
-    fetchPosts();
-
-    const handleSync = () => fetchPosts();
-    window.addEventListener('storage', handleSync);
-    window.addEventListener('ecaph_posts_updated', handleSync);
-
-    const interval = setInterval(fetchPosts, 10000);
-
-    return () => {
-      window.removeEventListener('storage', handleSync);
-      window.removeEventListener('ecaph_posts_updated', handleSync);
-      clearInterval(interval);
     };
+
+    fetchPosts();
   }, []);
 
   const featuredPost = posts[0];
@@ -114,7 +96,7 @@ export default function BlogPage() {
 
                     <div className={featuredPost.featured_image ? 'lg:col-span-7 space-y-4' : 'lg:col-span-12 space-y-4'}>
                       <h2 className="text-2xl sm:text-3xl font-extrabold text-[#0092DF] hover:text-[#007DC2] transition-colors leading-tight">
-                        <Link href={`/blog/${featuredPost.slug}`}>
+                        <Link href={`/blog/${featuredPost.slug}`} prefetch={false}>
                           {featuredPost.title}
                         </Link>
                       </h2>
@@ -123,7 +105,7 @@ export default function BlogPage() {
                         {featuredPost.summary}
                       </p>
 
-                      <Link href={`/blog/${featuredPost.slug}`} className="inline-block pt-2">
+                      <Link href={`/blog/${featuredPost.slug}`} prefetch={false} className="inline-block pt-2">
                         <Button className="bg-[#0092DF] hover:bg-[#007DC2] text-white font-bold group">
                           Read Full Article <ArrowRight className="ml-2 w-4 h-4 text-[#E67817] group-hover:translate-x-1 transition-transform" />
                         </Button>
@@ -163,7 +145,7 @@ export default function BlogPage() {
                             </div>
 
                             <h4 className="text-lg font-bold text-[#0092DF] hover:text-[#007DC2] transition-colors leading-snug line-clamp-2">
-                              <Link href={`/blog/${post.slug}`}>
+                              <Link href={`/blog/${post.slug}`} prefetch={false}>
                                 {post.title}
                               </Link>
                             </h4>
@@ -177,7 +159,7 @@ export default function BlogPage() {
                             <span className="text-[11px] text-[#94A3B8]">
                               {new Date(post.published_at || post.created_at).toLocaleDateString()}
                             </span>
-                            <Link href={`/blog/${post.slug}`} className="text-xs font-bold text-[#E67817] hover:underline flex items-center gap-1">
+                            <Link href={`/blog/${post.slug}`} prefetch={false} className="text-xs font-bold text-[#E67817] hover:underline flex items-center gap-1">
                               Read More <ArrowRight className="w-3.5 h-3.5" />
                             </Link>
                           </div>

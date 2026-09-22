@@ -137,6 +137,20 @@ export default function AboutPage() {
                 Collaborating with government institutions, development partners, and civil society to expand reach, influence policy, and sustain impact.
               </p>
             </div>
+            <div className="p-6 rounded-[10px] bg-gradient-to-r from-[#003D60] to-[#005A8D] text-white brand-shadow space-y-3 flex flex-col justify-between">
+              <div className="space-y-2">
+                <span className="bg-[#E67817] text-white px-2.5 py-0.5 rounded-[4px] text-[10px] font-extrabold uppercase tracking-wider">
+                  Legal Registration
+                </span>
+                <h4 className="text-base font-bold text-white">CAC Status &amp; Office</h4>
+                <p className="text-xs text-[#86C127] font-black tracking-wide">
+                  {siteConfig.cacId}
+                </p>
+                <p className="text-[11px] text-slate-100 leading-relaxed pt-1.5 border-t border-white/20">
+                  {siteConfig.address}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>

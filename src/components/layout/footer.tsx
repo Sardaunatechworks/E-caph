@@ -17,9 +17,10 @@ export function Footer() {
             {siteConfig.description}
           </p>
 
-          <div className="pt-2 text-xs text-slate-200 space-y-1.5">
-            <p className="flex items-center gap-2">
-              <MapPin className="w-3.5 h-3.5 text-[#86C127]" /> {siteConfig.address}
+          <div className="pt-2 text-xs text-slate-200 space-y-2">
+            <p className="flex items-start gap-2">
+              <MapPin className="w-4 h-4 text-[#86C127] shrink-0 mt-0.5" />
+              <span className="leading-relaxed">{siteConfig.address}</span>
             </p>
             <p className="flex items-center gap-2">
               <Mail className="w-3.5 h-3.5 text-[#86C127]" /> {siteConfig.email}
@@ -27,6 +28,9 @@ export function Footer() {
             <p className="flex items-center gap-2">
               <Phone className="w-3.5 h-3.5 text-[#86C127]" /> {siteConfig.phone}
             </p>
+            <div className="inline-flex items-center gap-1.5 bg-[#005A8D] px-2.5 py-1 rounded-[4px] border border-[#007DC2] text-[11px] font-bold text-white mt-1 shadow-xs">
+              <span className="text-[#86C127]">Registration ID:</span> {siteConfig.cacId}
+            </div>
           </div>
         </div>
 

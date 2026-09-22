@@ -17,7 +17,7 @@ export function Header() {
       {/* Top Information Bar - Deep Blue with Orange Accents */}
       <div className="bg-[#005A8D] text-white text-xs py-2 px-4 border-b border-[#007DC2]/40">
         <div className="container mx-auto max-w-7xl flex items-center justify-between">
-          <div className="flex items-center gap-6">
+          <div className="flex flex-wrap items-center gap-4 sm:gap-6">
             <a
               href={`mailto:${siteConfig.email}`}
               className="flex items-center gap-1.5 hover:text-[#E67817] transition-colors"
@@ -32,14 +32,17 @@ export function Header() {
               <Phone className="w-3.5 h-3.5 text-[#E67817]" />
               <span>{siteConfig.phone}</span>
             </a>
-            <span className="hidden md:flex items-center gap-1.5 text-slate-200">
-              <MapPin className="w-3.5 h-3.5 text-[#E67817]" />
-              {siteConfig.address}
+            <span className="hidden xl:flex items-center gap-1.5 text-slate-200">
+              <MapPin className="w-3.5 h-3.5 text-[#E67817] shrink-0" />
+              <span className="truncate">{siteConfig.address}</span>
             </span>
           </div>
 
-          <div className="flex items-center gap-3 text-[11px] font-medium text-slate-200">
-            <span>Enhancing Communities Action for Peace &amp; Health</span>
+          <div className="flex items-center gap-3 text-[11px] font-bold text-slate-200">
+            <span className="hidden md:inline">Enhancing Communities Action for Peace &amp; Health</span>
+            <span className="bg-[#E67817] text-white px-2 py-0.5 rounded-[4px] text-[10px] tracking-wider uppercase shadow-xs">
+              {siteConfig.cacId}
+            </span>
           </div>
         </div>
       </div>

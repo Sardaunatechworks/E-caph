@@ -15,51 +15,23 @@ export default function MediaPage() {
   const [selectedFilter, setSelectedFilter] = useState<string>('all');
   const [selectedMediaPreview, setSelectedMediaPreview] = useState<MediaItem | null>(null);
 
-  const fetchMedia = async () => {
-    let currentList: MediaItem[] = [];
-
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('ecaph_media_items');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            currentList = parsed.filter((m: MediaItem) => m.is_published !== false);
-          }
-        } catch {}
-      }
-    }
-
-    try {
-      const supabase = createClient();
-      const { data, error } = await supabase
-        .from('media_items')
-        .select('*')
-        .eq('is_published', true)
-        .order('created_at', { ascending: false });
-
-      if (!error && data && data.length > 0) {
-        currentList = data as MediaItem[];
-      }
-    } catch {}
-
-    setMediaItems(currentList);
-  };
-
   useEffect(() => {
-    fetchMedia();
+    const fetchMedia = async () => {
+      try {
+        const supabase = createClient();
+        const { data, error } = await supabase
+          .from('media_items')
+          .select('*')
+          .eq('is_published', true)
+          .order('created_at', { ascending: false });
 
-    const handleSync = () => fetchMedia();
-    window.addEventListener('storage', handleSync);
-    window.addEventListener('ecaph_media_updated', handleSync);
-
-    const interval = setInterval(fetchMedia, 10000);
-
-    return () => {
-      window.removeEventListener('storage', handleSync);
-      window.removeEventListener('ecaph_media_updated', handleSync);
-      clearInterval(interval);
+        if (!error && data) {
+          setMediaItems(data as MediaItem[]);
+        }
+      } catch {}
     };
+
+    fetchMedia();
   }, []);
 
   const filteredItems = mediaItems.filter(

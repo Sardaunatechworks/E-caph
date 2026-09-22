@@ -85,6 +85,7 @@ export interface Post {
   summary: string;
   content: string;
   featured_image: string | null;
+  images?: string[] | null;
   post_type: 'article' | 'news' | 'impact_story' | 'announcement' | 'press_release' | 'report' | 'field_update';
   status: 'draft' | 'under_review' | 'published' | 'archived';
   published_at: string | null;

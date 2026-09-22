@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { PDFViewerModal } from '@/components/common/pdf-viewer-modal';
 import { createClient } from '@/lib/supabase/client';
-import { Upload, X, FileText, Download, Eye, FileDown } from 'lucide-react';
+import { Upload, X, FileText, Download, Eye, FileDown, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import type { DownloadResource } from '@/types/database';
 
 export default function AdminResourcesPage() {
@@ -19,6 +19,9 @@ export default function AdminResourcesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRow, setEditingRow] = useState<DownloadResource | null>(null);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [uploadProgressMsg, setUploadProgressMsg] = useState('');
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
   const [selectedResourceForView, setSelectedResourceForView] = useState<DownloadResource | null>(null);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
 
@@ -40,45 +43,52 @@ export default function AdminResourcesPage() {
     if (!file) return;
 
     setUploadingFile(true);
+    setUploadError(null);
+    setUploadProgressMsg('Uploading PDF to storage...');
+
     const formattedSize = `${(file.size / (1024 * 1024)).toFixed(1)} MB`;
+    const defaultTitle = file.name.replace(/\.[^/.]+$/, '');
+    const defaultSlug = file.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
     try {
-      // 1. Read local file as Data URL
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const base64Url = event.target?.result as string;
-        setFormData((prev) => ({
-          ...prev,
-          file_url: base64Url,
-          file_size: formattedSize,
-          title: prev.title || file.name.replace(/\.[^/.]+$/, ''),
-          slug: prev.slug || file.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-        }));
+      const supabase = createClient();
+      const fileExt = file.name.split('.').pop() || 'pdf';
+      const cleanBaseName = defaultSlug.slice(0, 40);
+      const fileName = `pdf_${Date.now()}_${cleanBaseName}.${fileExt}`;
+      const filePath = `documents/${fileName}`;
 
-        // 2. Attempt Supabase Storage upload
-        try {
-          const supabase = createClient();
-          const fileExt = file.name.split('.').pop();
-          const fileName = `pdf_${Date.now()}.${fileExt}`;
-          const filePath = `documents/${fileName}`;
+      const { data: uploadResult, error: storageError } = await supabase.storage
+        .from('media')
+        .upload(filePath, file, {
+          upsert: true,
+          contentType: 'application/pdf',
+          cacheControl: '3600'
+        });
 
-          const { error: uploadError } = await supabase.storage
-            .from('media')
-            .upload(filePath, file, { upsert: true });
+      if (storageError) {
+        throw new Error(storageError.message);
+      }
 
-          if (!uploadError) {
-            const { data: publicUrlData } = supabase.storage
-              .from('media')
-              .getPublicUrl(filePath);
-            if (publicUrlData?.publicUrl) {
-              setFormData((prev) => ({ ...prev, file_url: publicUrlData.publicUrl }));
-            }
-          }
-        } catch {}
-      };
-      reader.readAsDataURL(file);
-    } catch (err) {
-      console.error('PDF File upload error:', err);
+      const { data: publicUrlData } = supabase.storage
+        .from('media')
+        .getPublicUrl(filePath);
+
+      if (!publicUrlData?.publicUrl) {
+        throw new Error('Failed to obtain public URL for uploaded file.');
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        file_url: publicUrlData.publicUrl,
+        file_size: formattedSize,
+        title: prev.title.trim() ? prev.title : defaultTitle,
+        slug: prev.slug.trim() ? prev.slug : defaultSlug,
+      }));
+
+      setUploadProgressMsg('PDF uploaded successfully!');
+    } catch (err: any) {
+      console.error('Storage upload error:', err);
+      setUploadError(err?.message || 'Failed to upload PDF file to storage. Please check connection or enter URL manually.');
     } finally {
       setUploadingFile(false);
     }
@@ -88,6 +98,7 @@ export default function AdminResourcesPage() {
     setLoading(true);
     let currentList: DownloadResource[] = [];
 
+    // Check localStorage first
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('ecaph_download_resources');
       if (saved) {
@@ -104,6 +115,9 @@ export default function AdminResourcesPage() {
 
       if (!error && dbData && dbData.length > 0) {
         currentList = dbData as DownloadResource[];
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('ecaph_download_resources', JSON.stringify(currentList));
+        }
       }
     } catch {
       // Fallback
@@ -128,7 +142,7 @@ export default function AdminResourcesPage() {
           </div>
           <div>
             <div className="font-bold text-[#0092DF] line-clamp-1">{row.title}</div>
-            <div className="text-[10px] text-[#64748B]">{row.file_size || 'PDF'} • {row.downloads_count} downloads</div>
+            <div className="text-[10px] text-[#64748B]">{row.file_size || 'PDF'} • {row.downloads_count || 0} downloads</div>
           </div>
         </div>
       ),
@@ -172,6 +186,8 @@ export default function AdminResourcesPage() {
 
   const handleOpenAdd = () => {
     setEditingRow(null);
+    setUploadError(null);
+    setUploadProgressMsg('');
     setFormData({
       title: '',
       slug: '',
@@ -189,6 +205,8 @@ export default function AdminResourcesPage() {
 
   const handleOpenEdit = (row: DownloadResource) => {
     setEditingRow(row);
+    setUploadError(null);
+    setUploadProgressMsg('');
     setFormData({
       title: row.title,
       slug: row.slug,
@@ -197,66 +215,128 @@ export default function AdminResourcesPage() {
       file_url: row.file_url,
       file_size: row.file_size || '',
       file_type: row.file_type || 'application/pdf',
-      downloads_count: row.downloads_count,
-      is_published: row.is_published,
+      downloads_count: row.downloads_count || 0,
+      is_published: row.is_published !== false,
       published_date: row.published_date || new Date().toISOString(),
     });
     setIsModalOpen(true);
   };
 
   const handleDelete = async (row: DownloadResource) => {
-    if (confirm(`Are you sure you want to delete "${row.title}"?`)) {
+    if (!confirm(`Are you sure you want to delete "${row.title}"?`)) {
+      return;
+    }
+
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.from('download_resources').delete().eq('id', row.id);
+      if (error) {
+        console.error('Delete error from DB:', error);
+        alert(`Failed to delete from database: ${error.message}`);
+        return;
+      }
+
       const updated = data.filter((d) => d.id !== row.id);
       setData(updated);
       if (typeof window !== 'undefined') {
         localStorage.setItem('ecaph_download_resources', JSON.stringify(updated));
         window.dispatchEvent(new Event('ecaph_resources_updated'));
       }
-      try {
-        const supabase = createClient();
-        await supabase.from('download_resources').delete().eq('id', row.id);
-      } catch {}
+    } catch (err: any) {
+      console.error('Delete exception:', err);
+      alert(`Delete error: ${err.message}`);
     }
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (uploadingFile) {
+      alert('Please wait for the PDF file to finish uploading before saving.');
+      return;
+    }
+
+    const cleanFileUrl = formData.file_url.trim();
+    if (!cleanFileUrl) {
+      alert('Please select a PDF file or provide a valid PDF download URL.');
+      return;
+    }
+
+    if (cleanFileUrl.startsWith('blob:') || cleanFileUrl.startsWith('data:')) {
+      alert('Invalid file URL format. Please choose a PDF file and let it upload, or paste a full https:// link.');
+      return;
+    }
+
+    setSaving(true);
     const supabase = createClient();
 
     const baseSlug = formData.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'document';
     const slug = editingRow
       ? (formData.slug || baseSlug)
       : `${baseSlug}-${Date.now().toString().slice(-4)}`;
-    const payload = { ...formData, slug };
+
+    const payload = {
+      title: formData.title.trim(),
+      slug,
+      description: formData.description?.trim() || '',
+      category: formData.category,
+      file_url: cleanFileUrl,
+      file_size: formData.file_size || 'PDF Document',
+      file_type: formData.file_type || 'application/pdf',
+      downloads_count: formData.downloads_count || 0,
+      is_published: formData.is_published,
+      published_date: formData.published_date || new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
     let updated: DownloadResource[] = [];
 
-    if (editingRow) {
-      updated = data.map((d) => (d.id === editingRow.id ? ({ ...d, ...payload } as DownloadResource) : d));
-      try {
-        await supabase.from('download_resources').upsert(payload, { onConflict: 'id' });
-      } catch {}
-    } else {
-      const newItem: DownloadResource = {
-        id: String(Date.now()),
-        ...payload,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      };
-      updated = [newItem, ...data];
-      try {
-        const { data: inserted } = await supabase.from('download_resources').upsert(payload, { onConflict: 'slug' }).select();
-        if (inserted && inserted[0]) {
-          updated = [inserted[0] as DownloadResource, ...data];
-        }
-      } catch {}
-    }
+    try {
+      if (editingRow) {
+        const { error: updateError } = await supabase
+          .from('download_resources')
+          .update(payload)
+          .eq('id', editingRow.id);
 
-    setData(updated);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('ecaph_download_resources', JSON.stringify(updated));
-      window.dispatchEvent(new Event('ecaph_resources_updated'));
+        if (updateError) {
+          throw new Error(updateError.message);
+        }
+
+        updated = data.map((d) => (d.id === editingRow.id ? ({ ...d, ...payload } as DownloadResource) : d));
+      } else {
+        const { data: inserted, error: insertError } = await supabase
+          .from('download_resources')
+          .insert({
+            ...payload,
+            created_at: new Date().toISOString(),
+          })
+          .select();
+
+        if (insertError) {
+          throw new Error(insertError.message);
+        }
+
+        const savedItem = (inserted && inserted[0]) ? (inserted[0] as DownloadResource) : {
+          id: String(Date.now()),
+          ...payload,
+          created_at: new Date().toISOString(),
+        };
+
+        updated = [savedItem, ...data];
+      }
+
+      setData(updated);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ecaph_download_resources', JSON.stringify(updated));
+        window.dispatchEvent(new Event('ecaph_resources_updated'));
+      }
+      setIsModalOpen(false);
+    } catch (err: any) {
+      console.error('Database save error:', err);
+      alert(`Error saving to database: ${err.message || 'Please check your connection and try again.'}`);
+    } finally {
+      setSaving(false);
     }
-    setIsModalOpen(false);
   };
 
   return (
@@ -266,7 +346,7 @@ export default function AdminResourcesPage() {
       <main className="p-8 max-w-7xl mx-auto w-full space-y-6">
         <DataTable
           title="Upload &amp; Manage PDF Resources"
-          description="Upload local PDF files from your computer, manage categories, track downloads, and publish documents."
+          description="Upload local PDF files from your computer, manage categories, track downloads, and publish documents live to the client Resource Hub."
           columns={columns}
           data={data}
           searchKey="title"
@@ -280,7 +360,7 @@ export default function AdminResourcesPage() {
 
       <ModalForm
         isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => !saving && setIsModalOpen(false)}
         title={editingRow ? 'Edit PDF Resource' : 'Upload PDF Resource'}
       >
         <form onSubmit={handleSave} className="space-y-4">
@@ -291,32 +371,58 @@ export default function AdminResourcesPage() {
             <div className="p-4 border border-[#E2E8F0] rounded-[8px] bg-[#F8FAFC] space-y-3">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-[8px] bg-[#E67817] text-white flex items-center justify-center shrink-0 shadow-sm">
-                  <FileDown className="w-6 h-6" />
+                  {uploadingFile ? <Loader2 className="w-6 h-6 animate-spin" /> : <FileDown className="w-6 h-6" />}
                 </div>
 
                 <div className="flex-1 space-y-1">
-                  <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-[#0092DF] hover:bg-[#007DC2] text-white font-bold text-xs rounded-[6px] transition-colors shadow-sm">
+                  <label className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 text-white font-bold text-xs rounded-[6px] transition-colors shadow-sm ${
+                    uploadingFile ? 'bg-slate-400 cursor-not-allowed' : 'bg-[#0092DF] hover:bg-[#007DC2]'
+                  }`}>
                     <Upload className="w-4 h-4" />
-                    {uploadingFile ? 'Processing PDF...' : 'Choose PDF File from Computer'}
+                    {uploadingFile ? 'Uploading PDF to Storage...' : 'Choose PDF File from Computer'}
                     <input
                       type="file"
                       accept="application/pdf,.pdf"
                       onChange={handleFileUpload}
+                      disabled={uploadingFile}
                       className="hidden"
                     />
                   </label>
-                  <p className="text-[11px] text-[#64748B]">Select a PDF document from your computer.</p>
+                  <p className="text-[11px] text-[#64748B]">
+                    Select a PDF document from your computer (auto-uploaded to cloud storage).
+                  </p>
                 </div>
               </div>
 
+              {uploadProgressMsg && !uploadError && (
+                <div className="text-xs text-emerald-600 font-semibold flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                  {uploadProgressMsg}
+                </div>
+              )}
+
+              {uploadError && (
+                <div className="text-xs text-rose-600 font-medium flex items-center gap-1.5 bg-rose-50 p-2 rounded">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+                  {uploadError}
+                </div>
+              )}
+
               {formData.file_url && (
                 <div className="p-2.5 bg-white border border-[#E2E8F0] rounded-[6px] flex items-center justify-between text-xs">
-                  <span className="font-bold text-[#0092DF] line-clamp-1">File Attached ({formData.file_size || 'PDF'})</span>
+                  <div className="flex items-center gap-2 max-w-[80%]">
+                    <FileText className="w-4 h-4 text-[#0092DF] shrink-0" />
+                    <span className="font-bold text-[#0092DF] truncate">File Ready: {formData.file_size || 'PDF'}</span>
+                  </div>
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
-                    onClick={() => setFormData({ ...formData, file_url: '', file_size: '' })}
+                    onClick={() => {
+                      setFormData({ ...formData, file_url: '', file_size: '' });
+                      setUploadProgressMsg('');
+                      setUploadError(null);
+                    }}
                     className="text-xs text-rose-600 hover:text-rose-700 h-7"
                   >
                     <X className="w-3.5 h-3.5 mr-1" /> Clear
@@ -324,17 +430,20 @@ export default function AdminResourcesPage() {
                 </div>
               )}
 
-              <Input
-                value={formData.file_url}
-                onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
-                placeholder="Or paste external PDF URL (https://...)"
-                required
-                className="bg-white border-[#E2E8F0] h-8 text-[11px] rounded-[4px]"
-              />
+              <div className="space-y-1">
+                <label className="text-[11px] font-medium text-[#64748B]">Cloud PDF Storage Link / URL:</label>
+                <Input
+                  value={formData.file_url}
+                  onChange={(e) => setFormData({ ...formData, file_url: e.target.value })}
+                  placeholder="https://..."
+                  required
+                  className="bg-white border-[#E2E8F0] h-8 text-[11px] rounded-[4px]"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <label className="text-xs font-bold text-[#1E293B]">Document Title *</label>
               <Input
@@ -381,17 +490,28 @@ export default function AdminResourcesPage() {
               onChange={(e) => setFormData({ ...formData, is_published: e.target.checked })}
               className="rounded text-[#0092DF] focus:ring-[#0092DF]"
             />
-            <label htmlFor="is_published_res" className="text-xs font-bold text-[#1E293B]">
-              Publish Document Immediately to Resource Hub
+            <label htmlFor="is_published_res" className="text-xs font-bold text-[#1E293B] cursor-pointer">
+              Publish Document Immediately to Public Resource Hub
             </label>
           </div>
 
           <div className="pt-4 border-t border-[#E2E8F0] flex justify-end gap-3">
-            <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>
+            <Button variant="outline" type="button" disabled={saving} onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" className="bg-[#0092DF] hover:bg-[#007DC2] text-white font-bold">
-              Save PDF Resource
+            <Button
+              type="submit"
+              disabled={saving || uploadingFile}
+              className="bg-[#0092DF] hover:bg-[#007DC2] text-white font-bold"
+            >
+              {saving ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                'Save PDF Resource'
+              )}
             </Button>
           </div>
         </form>

@@ -13,7 +13,8 @@ export const siteConfig = {
   ogImage: '/images/og-default.jpg',
   email: 'caph4dev35@gmail.com',
   phone: '09022207412',
-  address: 'Kaduna, Nigeria',
+  address: 'No. 1 Old Intercity Building Intercity Centre off Ahmadu Bello Way, Mogadishu City Centre, Kaduna',
+  cacId: 'CAC/IT/NO 144280',
 
   mission:
     'To promote sustainable development by empowering women and young people to lead innovative, inclusive, and sustainable solutions that address social, economic, health, and governance challenges within their communities.',

@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { siteConfig } from '@/config/site';
 import { thematicFocusAreas, flagshipInitiatives, technicalApproaches } from '@/config/theme';
@@ -8,33 +11,41 @@ import { Badge } from '@/components/ui/badge';
 import { FocusAreaCard } from '@/components/common/focus-area-card';
 import { InitiativeCard } from '@/components/common/initiative-card';
 import { Logo } from '@/components/common/logo';
-import { createClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/client';
 import { ArrowRight, Award, Sparkles, BookOpen, Users, HeartPulse, ShieldCheck, TrendingUp } from 'lucide-react';
 import type { TeamMember, Post, Project, Programme, ImpactStatistic } from '@/types/database';
 
-export default async function HomePage() {
-  let programmes: Programme[] = [];
-  let projects: Project[] = [];
-  let stats: ImpactStatistic[] = [];
-  let posts: Post[] = [];
-  let teamMembers: TeamMember[] = [];
+export default function HomePage() {
+  const [programmes, setProgrammes] = useState<Programme[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [stats, setStats] = useState<ImpactStatistic[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
-  try {
-    const supabase = await createClient();
-    const [resProg, resProj, resStat, resPost, resTeam] = await Promise.all([
-      supabase.from('programmes').select('*').eq('is_published', true).order('order_index', { ascending: true }),
-      supabase.from('projects').select('*').eq('is_published', true).order('created_at', { ascending: false }),
-      supabase.from('impact_statistics').select('*').eq('is_published', true).order('order_index', { ascending: true }),
-      supabase.from('posts').select('*').eq('status', 'published').order('published_at', { ascending: false }).limit(3),
-      supabase.from('team_members').select('*').eq('is_active', true).order('order_index', { ascending: true }).limit(4),
-    ]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const supabase = createClient();
+        const [resProg, resProj, resStat, resPost, resTeam] = await Promise.all([
+          supabase.from('programmes').select('*').eq('is_published', true).order('order_index', { ascending: true }),
+          supabase.from('projects').select('*').eq('is_published', true).order('created_at', { ascending: false }),
+          supabase.from('impact_statistics').select('*').eq('is_published', true).order('order_index', { ascending: true }),
+          supabase.from('posts').select('*').eq('status', 'published').order('published_at', { ascending: false }).limit(3),
+          supabase.from('team_members').select('*').eq('is_active', true).order('order_index', { ascending: true }).limit(4),
+        ]);
 
-    programmes = (resProg.data as Programme[] | null) || [];
-    projects = (resProj.data as Project[] | null) || [];
-    stats = (resStat.data as ImpactStatistic[] | null) || [];
-    posts = (resPost.data as Post[] | null) || [];
-    teamMembers = (resTeam.data as TeamMember[] | null) || [];
-  } catch {}
+        if (resProg.data) setProgrammes(resProg.data as Programme[]);
+        if (resProj.data) setProjects(resProj.data as Project[]);
+        if (resStat.data) setStats(resStat.data as ImpactStatistic[]);
+        if (resPost.data) setPosts(resPost.data as Post[]);
+        if (resTeam.data) setTeamMembers(resTeam.data as TeamMember[]);
+      } catch {}
+      setLoaded(true);
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F7FAF8] text-[#1E293B] font-sans">
@@ -125,13 +136,13 @@ export default async function HomePage() {
                     Bridging Community Needs With Evidence &amp; Youth Innovation
                   </h3>
                   <p className="text-xs text-slate-100 leading-relaxed max-w-md">
-                    Operating in Northern Nigeria with registered CAC certificate RC:144280. Empowering local health centers, adolescent girls, and youth advocates.
+                    Operating in Northern Nigeria with registered CAC certificate {siteConfig.cacId}. Empowering local health centers, adolescent girls, and youth advocates.
                   </p>
                 </div>
 
-                <div className="pt-6 border-t border-white/20 flex items-center justify-between text-xs text-slate-200 relative z-10 font-bold">
-                  <span>CAC Registered: RC:144280</span>
-                  <span>Kaduna, Nigeria</span>
+                <div className="pt-6 border-t border-white/20 flex flex-wrap items-center justify-between text-xs text-slate-200 relative z-10 font-bold gap-2">
+                  <span className="bg-[#E67817] text-white px-2 py-0.5 rounded-[4px] text-[10px]">CAC Reg: {siteConfig.cacId}</span>
+                  <span className="text-[11px] font-semibold">{siteConfig.address}</span>
                 </div>
               </div>
             </div>
@@ -197,29 +208,32 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 5. Impact Counter Strip */}
-      <section className="py-16 bg-[#003D60] text-white">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div className="space-y-2">
-              <div className="text-4xl sm:text-5xl font-black text-[#86C127]">15,000+</div>
-              <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">Beneficiaries Reached</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-4xl sm:text-5xl font-black text-[#E67817]">40+</div>
-              <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">Health Centers Monitored</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-4xl sm:text-5xl font-black text-[#0092DF]">120+</div>
-              <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">Youth Champions Trained</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-4xl sm:text-5xl font-black text-[#86C127]">250+</div>
-              <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">Women Skills Hub Graduates</div>
+      {/* 5. Impact Counter Strip — Real-time from DB */}
+      {stats.length > 0 && (
+        <section className="py-16 bg-[#003D60] text-white">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              {stats.slice(0, 4).map((stat, idx) => {
+                const accentColors = ['text-[#86C127]', 'text-[#E67817]', 'text-[#0092DF]', 'text-[#86C127]'];
+                const displayValue = stat.value != null
+                  ? `${stat.value.toLocaleString()}${stat.suffix || ''}`
+                  : '—';
+
+                return (
+                  <div key={stat.id} className="space-y-2">
+                    <div className={`text-4xl sm:text-5xl font-black ${accentColors[idx % accentColors.length]}`}>
+                      {displayValue}
+                    </div>
+                    <div className="text-xs font-bold text-slate-200 uppercase tracking-wider">
+                      {stat.label}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 6. Technical Approaches */}
       <section className="py-20 bg-[#F3F7F5] border-b border-[#E2E8F0]">
@@ -245,109 +259,113 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 9. Latest News & Stories */}
-      <section className="py-20 bg-white border-b border-[#E2E8F0]">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div className="space-y-3 max-w-2xl">
-              <Badge variant="secondary">Field Updates</Badge>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0092DF]">
-                Latest News &amp; Articles
-              </h2>
-            </div>
-            <Link href="/stories" className="text-xs font-bold text-[#E67817] hover:underline flex items-center shrink-0 group">
-              Browse All News <ArrowRight className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:translate-x-1" />
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {posts.map((post) => (
-              <div key={post.id} className="rounded-[12px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F8FAFC] p-6 brand-shadow hover:brand-shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group">
-                <div className="space-y-3">
-                  {post.featured_image && (
-                    <div className="aspect-video w-full rounded-[8px] bg-[#E2E8F0] overflow-hidden border border-slate-200 shadow-xs mb-3">
-                      <img src={post.featured_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
-                    </div>
-                  )}
-                  <Badge variant="secondary" className="text-[11px] uppercase bg-[#E6F4FC] text-[#0092DF] font-bold">
-                    {post.post_type.replace('_', ' ')}
-                  </Badge>
-                  <h3 className="text-lg font-extrabold text-[#0092DF] leading-snug group-hover:text-[#007DC2] transition-colors">
-                    {post.title}
-                  </h3>
-                  <p className="text-xs text-[#64748B] line-clamp-3 leading-relaxed">{post.summary}</p>
-                </div>
-                <Link href="/stories" className="text-xs font-bold text-[#E67817] hover:underline inline-flex items-center group/link pt-2 border-t border-[#E2E8F0]">
-                  Read Article <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform duration-200 group-hover/link:translate-x-1" />
-                </Link>
+      {/* 9. Latest News & Stories — Real-time from DB */}
+      {loaded && posts.length > 0 && (
+        <section className="py-20 bg-white border-b border-[#E2E8F0]">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div className="space-y-3 max-w-2xl">
+                <Badge variant="secondary">Field Updates</Badge>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0092DF]">
+                  Latest News &amp; Articles
+                </h2>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 11. Team Preview Section */}
-      <section className="py-20 bg-[#F3F7F5] border-b border-[#E2E8F0]">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-            <div className="space-y-3 max-w-2xl">
-              <Badge variant="secondary">Leadership</Badge>
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0092DF]">
-                Meet Our Team
-              </h2>
+              <Link href="/stories" className="text-xs font-bold text-[#E67817] hover:underline flex items-center shrink-0 group">
+                Browse All News <ArrowRight className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:translate-x-1" />
+              </Link>
             </div>
-            <Link href="/team" className="text-xs font-bold text-[#E67817] hover:underline flex items-center shrink-0 group">
-              Meet Full Team <ArrowRight className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:translate-x-1" />
-            </Link>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {posts.map((post) => (
+                <div key={post.id} className="rounded-[12px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-[#F8FAFC] p-6 brand-shadow hover:brand-shadow-lg transition-all duration-300 flex flex-col justify-between space-y-4 group">
+                  <div className="space-y-3">
+                    {post.featured_image && (
+                      <div className="aspect-video w-full rounded-[8px] bg-[#E2E8F0] overflow-hidden border border-slate-200 shadow-xs mb-3">
+                        <img src={post.featured_image} alt={post.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" decoding="async" />
+                      </div>
+                    )}
+                    <Badge variant="secondary" className="text-[11px] uppercase bg-[#E6F4FC] text-[#0092DF] font-bold">
+                      {post.post_type.replace('_', ' ')}
+                    </Badge>
+                    <h3 className="text-lg font-extrabold text-[#0092DF] leading-snug group-hover:text-[#007DC2] transition-colors">
+                      {post.title}
+                    </h3>
+                    <p className="text-xs text-[#64748B] line-clamp-3 leading-relaxed">{post.summary}</p>
+                  </div>
+                  <Link href={`/blog/${post.slug}`} prefetch={false} className="text-xs font-bold text-[#E67817] hover:underline inline-flex items-center group/link pt-2 border-t border-[#E2E8F0]">
+                    Read Article <ArrowRight className="w-3.5 h-3.5 ml-1 transition-transform duration-200 group-hover/link:translate-x-1" />
+                  </Link>
+                </div>
+              ))}
+            </div>
           </div>
+        </section>
+      )}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
-            {teamMembers.map((member, idx) => {
-              const initials = member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2);
-              const accentColors = ['bg-[#E67817]', 'bg-[#86C127]', 'bg-[#0092DF]', 'bg-[#E67817]'];
-              const accent = accentColors[idx % accentColors.length];
+      {/* 11. Team Preview Section — Real-time from DB */}
+      {loaded && teamMembers.length > 0 && (
+        <section className="py-20 bg-[#F3F7F5] border-b border-[#E2E8F0]">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-12">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+              <div className="space-y-3 max-w-2xl">
+                <Badge variant="secondary">Leadership</Badge>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-[#0092DF]">
+                  Meet Our Team
+                </h2>
+              </div>
+              <Link href="/team" className="text-xs font-bold text-[#E67817] hover:underline flex items-center shrink-0 group">
+                Meet Full Team <ArrowRight className="w-4 h-4 ml-1 transition-transform duration-200 group-hover:translate-x-1" />
+              </Link>
+            </div>
 
-              return (
-                <div key={member.id} className="flex flex-col items-center text-center space-y-6 group">
-                  {/* Photo Card with Offset Accent Background */}
-                  <div className="relative w-full max-w-[260px]">
-                    <div
-                      className={`absolute inset-0 translate-x-3 translate-y-3 rounded-[20px] ${accent} transition-transform duration-300 group-hover:translate-x-4 group-hover:translate-y-4`}
-                    />
-                    <div className="relative aspect-square w-full rounded-[20px] bg-[#D1D5DB] overflow-hidden border border-slate-200/80 shadow-sm">
-                      {member.avatar_url ? (
-                        <img
-                          src={member.avatar_url}
-                          alt={member.full_name}
-                          className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-[#CBD5E1]">
-                          <div className="w-16 h-16 rounded-full bg-[#0092DF] text-white flex items-center justify-center text-xl font-black shadow-md">
-                            {initials}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+              {teamMembers.map((member, idx) => {
+                const initials = member.full_name.split(' ').map(n => n[0]).join('').slice(0, 2);
+                const accentColors = ['bg-[#E67817]', 'bg-[#86C127]', 'bg-[#0092DF]', 'bg-[#E67817]'];
+                const accent = accentColors[idx % accentColors.length];
+
+                return (
+                  <div key={member.id} className="flex flex-col items-center text-center space-y-6 group">
+                    {/* Photo Card with Offset Accent Background */}
+                    <div className="relative w-full max-w-[260px]">
+                      <div
+                        className={`absolute inset-0 translate-x-3 translate-y-3 rounded-[20px] ${accent} transition-transform duration-300 group-hover:translate-x-4 group-hover:translate-y-4`}
+                      />
+                      <div className="relative aspect-square w-full rounded-[20px] bg-[#D1D5DB] overflow-hidden border border-slate-200/80 shadow-sm">
+                        {member.avatar_url ? (
+                          <img
+                            src={member.avatar_url}
+                            alt={member.full_name}
+                            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-[#CBD5E1]">
+                            <div className="w-16 h-16 rounded-full bg-[#0092DF] text-white flex items-center justify-center text-xl font-black shadow-md">
+                              {initials}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Member Name and Position Only */}
+                    <div className="space-y-1 pt-1">
+                      <h3 className="text-base font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
+                        {member.full_name}
+                      </h3>
+                      <p className="text-xs text-[#E67817] font-bold uppercase tracking-wider">
+                        {member.role_title}
+                      </p>
                     </div>
                   </div>
-
-                  {/* Member Name and Position Only */}
-                  <div className="space-y-1 pt-1">
-                    <h3 className="text-base font-extrabold text-[#0092DF] group-hover:text-[#007DC2] transition-colors leading-snug">
-                      {member.full_name}
-                    </h3>
-                    <p className="text-xs text-[#E67817] font-bold uppercase tracking-wider">
-                      {member.role_title}
-                    </p>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* 12. Final Call to Action */}
       <section className="py-20 bg-[#003D60] text-white text-center">

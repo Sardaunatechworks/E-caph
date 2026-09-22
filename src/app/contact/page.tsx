@@ -38,13 +38,16 @@ export default function ContactPage() {
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-start gap-4 p-5 rounded-[10px] bg-[#F3F7F5] border border-[#E2E8F0]">
+              <div className="flex items-start gap-4 p-5 rounded-[10px] bg-[#E6F4FC] border border-[#0092DF]/30 shadow-xs">
                 <div className="w-10 h-10 rounded-[6px] bg-[#0092DF] text-white flex items-center justify-center shrink-0">
                   <MapPin className="w-5 h-5 text-[#86C127]" />
                 </div>
-                <div>
-                  <h4 className="font-bold text-[#1E293B] text-sm">Office Address</h4>
-                  <p className="text-xs text-[#64748B] mt-0.5">{siteConfig.address}</p>
+                <div className="space-y-1">
+                  <h4 className="font-bold text-[#0092DF] text-sm">Official Headquarters</h4>
+                  <p className="text-xs text-[#1E293B] font-semibold leading-relaxed">{siteConfig.address}</p>
+                  <div className="inline-flex items-center gap-1.5 bg-[#005A8D] px-2.5 py-0.5 rounded-[4px] text-[11px] font-bold text-white mt-1.5 shadow-xs">
+                    <span className="text-[#86C127]">Registration ID:</span> {siteConfig.cacId}
+                  </div>
                 </div>
               </div>
 
