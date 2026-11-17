@@ -143,7 +143,7 @@ if (fs.existsSync('public/.htaccess')) {
 // 1b. Write chunk fallbacks to prevent 404s and ChunkLoadErrors for any client with cached references
 const chunksDir = path.join('out', '_next', 'static', 'chunks');
 if (fs.existsSync(chunksDir)) {
-  const universalFallbackJs = '(function(){try{var c=(typeof document!=="undefined"&&document.currentScript)?document.currentScript:void 0;(globalThis.TURBOPACK=globalThis.TURBOPACK||[]).push([c,{otherChunks:[],runtimeModuleIds:[]}]);}catch(e){}if(typeof window!=="undefined"&&!window.__ecaph_reloading){window.__ecaph_reloading=true;try{var last=sessionStorage.getItem("ecaph_last_chunk_reload");if(!last||Date.now()-parseInt(last,10)>10000){sessionStorage.setItem("ecaph_last_chunk_reload",Date.now().toString());setTimeout(function(){window.location.reload();},150);}}catch(e){setTimeout(function(){window.location.reload();},150);}}})();';
+  const universalFallbackJs = '(function(){if(typeof window!=="undefined"&&!window.__ecaph_reloading){window.__ecaph_reloading=true;try{var last=sessionStorage.getItem("ecaph_chunk_reload");if(!last||Date.now()-parseInt(last,10)>3000){sessionStorage.setItem("ecaph_chunk_reload",Date.now().toString());setTimeout(function(){window.location.reload();},100);}}catch(e){window.location.reload();}}})();';
 
   // Read the primary compiled CSS file so that fallback.css and all legacy CSS hashes contain FULL STYLES
   const existingCssFiles = fs.readdirSync(chunksDir).filter(f => f.endsWith('.css') && f !== 'fallback.css');
