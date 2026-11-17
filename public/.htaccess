@@ -19,7 +19,7 @@
   AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json image/svg+xml
 </IfModule>
 
-# 2b. Cache-Control Headers (Ensures instant updates after deployment)
+# 3. Cache-Control Headers (Ensures instant updates after deployment)
 <IfModule mod_headers.c>
   # Never cache HTML or Next.js RSC data files (ensures browsers always fetch fresh chunk references)
   <FilesMatch "\.(html|htm|txt)$">
@@ -34,54 +34,50 @@
   </FilesMatch>
 </IfModule>
 
-# 3. Disable Directory Browsing & MultiViews
+# 4. Disable Directory Browsing & MultiViews
 Options -Indexes -MultiViews
 RewriteEngine On
 RewriteBase /
 
-# 4. Force HTTPS Security
+# 5. Force HTTPS Security
 RewriteCond %{HTTPS} off
 RewriteCond %{HTTP:X-Forwarded-Proto} !https
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# 4b. Font compatibility alias (safely remaps .p. woff2 to non-.p. or vice versa if file is missing)
+# 6. SERVE EXISTING STATIC FILES & DIRECTORIES DIRECTLY FIRST
+# (Never rewrite real files - ensures existing CSS, JS, fonts, images are served directly without interference)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# 7. Font compatibility alias (safely remaps .p. woff2 to non-.p. or vice versa if file is missing)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^_next/static/media/(.+)-s\.p\.(.+\.woff2)$ _next/static/media/$1-s.$2 [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^_next/static/media/(.+)-s\.(.+\.woff2)$ _next/static/media/$1-s.p.$2 [L]
 
-# 4c. Chunk compatibility fallback (prevents 404 & ChunkLoadError for any missing chunk from older builds)
+# 8. Chunk compatibility fallback (prevents 404 & ChunkLoadError for any missing chunk from older builds)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^_next/static/chunks/(.+)\.js$ _next/static/chunks/fallback.js [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^_next/static/chunks/(.+)\.css$ _next/static/chunks/fallback.css [L]
 
-# 5. NEVER rewrite static Next.js assets, CSS, JS, fonts, media
-RewriteRule ^_next/(.*)$ _next/$1 [L]
-RewriteCond %{REQUEST_URI} \.(css|js|mjs|json|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot|pdf|webp|txt)$ [NC]
-RewriteRule ^ - [L]
-
-# 6. Serve existing files & directories directly
-RewriteCond %{REQUEST_FILENAME} -f [OR]
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteRule ^ - [L]
-
-# 7. Clean URLs: rewrite /page/ to /page/index.html if exists
+# 9. Clean URLs: rewrite /page/ to /page/index.html if exists
 RewriteCond %{REQUEST_FILENAME}/index.html -f
 RewriteRule ^(.*)$ $1/index.html [L]
 
-# 8. Clean URLs: rewrite /page to /page/index.html if directory/index.html exists
+# 10. Clean URLs: rewrite /page to /page/index.html if directory/index.html exists
 RewriteCond %{REQUEST_URI} !/$
 RewriteCond %{REQUEST_FILENAME}/index.html -f
 RewriteRule ^(.*)$ $1/index.html [L]
 
-# 9. Clean URLs: rewrite /page to /page.html if exists
+# 11. Clean URLs: rewrite /page to /page.html if exists
 RewriteCond %{REQUEST_FILENAME}.html -f
 RewriteRule ^(.*)$ $1.html [L]
 
-# 9b. Dynamic Blog/Stories/Publications fallback:
+# 12. Dynamic Blog/Stories/Publications fallback:
 # If a /blog/<slug> URL is requested and doesn't exist statically on disk,
 # rewrite internally to blog/view/index.html so the client can load the post dynamically
 RewriteCond %{REQUEST_URI} ^/blog/ [NC]
@@ -90,7 +86,5 @@ RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}/index.html !-f
 RewriteRule ^blog/(.+)$ blog/view/index.html [L]
 
-# 10. Fallback 404
+# 13. Fallback 404
 ErrorDocument 404 /404/index.html
-
-

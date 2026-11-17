@@ -144,7 +144,15 @@ if (fs.existsSync('public/.htaccess')) {
 const chunksDir = path.join('out', '_next', 'static', 'chunks');
 if (fs.existsSync(chunksDir)) {
   const universalFallbackJs = '(function(){try{var c=(typeof document!=="undefined"&&document.currentScript)?document.currentScript:void 0;(globalThis.TURBOPACK=globalThis.TURBOPACK||[]).push([c,{otherChunks:[],runtimeModuleIds:[]}]);}catch(e){}if(typeof window!=="undefined"&&!window.__ecaph_reloading){window.__ecaph_reloading=true;try{var last=sessionStorage.getItem("ecaph_last_chunk_reload");if(!last||Date.now()-parseInt(last,10)>10000){sessionStorage.setItem("ecaph_last_chunk_reload",Date.now().toString());setTimeout(function(){window.location.reload();},150);}}catch(e){setTimeout(function(){window.location.reload();},150);}}})();';
-  const universalFallbackCss = '/* fallback */';
+
+  // Read the primary compiled CSS file so that fallback.css and all legacy CSS hashes contain FULL STYLES
+  const existingCssFiles = fs.readdirSync(chunksDir).filter(f => f.endsWith('.css') && f !== 'fallback.css');
+  let primaryCssContent = '/* fallback */';
+  if (existingCssFiles.length > 0) {
+    existingCssFiles.sort((a, b) => fs.statSync(path.join(chunksDir, b)).size - fs.statSync(path.join(chunksDir, a)).size);
+    primaryCssContent = fs.readFileSync(path.join(chunksDir, existingCssFiles[0]), 'utf8');
+  }
+  const universalFallbackCss = primaryCssContent;
 
   fs.writeFileSync(path.join(chunksDir, 'fallback.js'), universalFallbackJs);
   fs.writeFileSync(path.join(chunksDir, 'fallback.css'), universalFallbackCss);
