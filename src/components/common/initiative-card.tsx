@@ -8,6 +8,7 @@ interface InitiativeCardProps {
   category: string;
   description: string;
   location: string;
+  featured_image?: string | null;
   isFeatured?: boolean;
 }
 
@@ -17,12 +18,24 @@ export function InitiativeCard({
   category,
   description,
   location,
+  featured_image,
   isFeatured = false,
 }: InitiativeCardProps) {
   if (isFeatured) {
     return (
       <div className="group rounded-[10px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-gradient-to-br from-[#003D60] to-[#005A8D] text-white p-8 brand-shadow-lg card-hover-lift space-y-6 flex flex-col justify-between">
         <div className="space-y-4">
+          {featured_image && (
+            <div className="aspect-video w-full rounded-[8px] bg-slate-900/30 overflow-hidden border border-white/20 shadow-xs">
+              <img
+                src={featured_image}
+                alt={title}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                loading="lazy"
+              />
+            </div>
+          )}
+
           <div className="flex items-center justify-between">
             <Badge className="bg-[#86C127] text-white font-bold border-none uppercase text-[10px] tracking-wider animate-soft-pulse">
               Featured Flagship Initiative
@@ -58,6 +71,17 @@ export function InitiativeCard({
   return (
     <div className="group rounded-[10px] border border-[#E2E8F0] border-t-4 border-t-[#86C127] bg-white p-6 brand-shadow card-hover-lift hover:brand-shadow-lg transition-all duration-150 flex flex-col justify-between space-y-4">
       <div className="space-y-3">
+        {featured_image && (
+          <div className="aspect-video w-full rounded-[8px] bg-slate-100 overflow-hidden border border-slate-200 shadow-xs">
+            <img
+              src={featured_image}
+              alt={title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
           <Badge variant="secondary" className="text-[11px] bg-[#F3F9E9] text-[#6EA71F]">
             {category}

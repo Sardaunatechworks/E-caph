@@ -18,6 +18,16 @@ export default function ProjectsPage() {
 
   useEffect(() => {
     const fetchProjects = async () => {
+      let cached: Project[] = [];
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('ecaph_projects');
+        if (saved) {
+          try {
+            cached = JSON.parse(saved);
+          } catch {}
+        }
+      }
+
       try {
         const supabase = createClient();
         const { data, error } = await supabase
@@ -26,13 +36,25 @@ export default function ProjectsPage() {
           .eq('is_published', true)
           .order('created_at', { ascending: false });
 
-        if (!error && data) {
+        if (!error && data && data.length > 0) {
           setProjects(data as Project[]);
+        } else if (cached.length > 0) {
+          setProjects(cached.filter((p) => p.is_published));
         }
-      } catch {}
+      } catch {
+        if (cached.length > 0) {
+          setProjects(cached.filter((p) => p.is_published));
+        }
+      }
     };
 
     fetchProjects();
+
+    const handleUpdate = () => fetchProjects();
+    window.addEventListener('ecaph_projects_updated', handleUpdate);
+    return () => {
+      window.removeEventListener('ecaph_projects_updated', handleUpdate);
+    };
   }, []);
 
   const filteredProjects = projects.filter((project) => {

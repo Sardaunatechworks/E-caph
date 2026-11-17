@@ -36,39 +36,65 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const programme = siteConfig.nav.footer.programmes.find(
+  let title = siteConfig.nav.footer.programmes.find(
     (p) => p.href === `/programmes/${slug}`
-  );
+  )?.label;
 
-  if (!programme) return { title: 'Programme Not Found' };
+  if (!title) {
+    try {
+      const supabase = await createClient();
+      const { data } = await supabase
+        .from('programmes')
+        .select('title')
+        .eq('slug', slug)
+        .maybeSingle();
+      if (data?.title) title = data.title;
+    } catch {}
+  }
+
+  if (!title) return { title: 'Programme Not Found' };
 
   return {
-    title: programme.label,
-    description: `Learn about ${programme.label} at ${siteConfig.name}.`,
+    title,
+    description: `Learn about ${title} at ${siteConfig.name}.`,
   };
 }
 
 export default async function ProgrammeDetailPage({ params }: Props) {
   const { slug } = await params;
-  const programme = siteConfig.nav.footer.programmes.find(
+  const staticProgramme = siteConfig.nav.footer.programmes.find(
     (p) => p.href === `/programmes/${slug}`
   );
 
-  if (!programme) notFound();
-
+  let dbProgramme: {
+    id?: string;
+    title?: string;
+    slug?: string;
+    featured_image?: string | null;
+    description?: string;
+  } | null = null;
   let dbProjects: Project[] | null = null;
+
   try {
     const supabase = await createClient();
-    const { data } = await supabase
-      .from('projects')
-      .select('*')
-      .eq('is_published', true)
-      .order('created_at', { ascending: false });
-    dbProjects = data as Project[] | null;
+    const [progRes, projRes] = await Promise.all([
+      supabase.from('programmes').select('*').eq('slug', slug).maybeSingle(),
+      supabase.from('projects').select('*').eq('is_published', true).order('created_at', { ascending: false }),
+    ]);
+    if (progRes.data) dbProgramme = progRes.data;
+    if (projRes.data) dbProjects = projRes.data as Project[];
   } catch {
     // Crash-proof fallback for Vercel deployment
   }
 
+  if (!staticProgramme && !dbProgramme) {
+    notFound();
+  }
+
+  const programmeTitle = dbProgramme?.title || staticProgramme?.label || 'Programme';
+  const programmeDesc =
+    dbProgramme?.description ||
+    `${programmeTitle} is a strategic pillar within ${siteConfig.name}, dedicated to designing scalable interventions alongside grassroots communities.`;
   const programmeProjects = dbProjects || [];
 
   return (
@@ -76,7 +102,7 @@ export default async function ProgrammeDetailPage({ params }: Props) {
       <Header />
 
       <PageBanner
-        title={programme.label}
+        title={programmeTitle}
         subtitle="Thematic programme pillar driving community-led solutions across Nigeria."
         breadcrumb={[{ label: 'Programmes', href: '/programmes' }]}
       />
@@ -84,10 +110,20 @@ export default async function ProgrammeDetailPage({ params }: Props) {
       <section className="py-16 bg-white border-b border-[#E2E8F0]">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-12 gap-12">
           <div className="lg:col-span-8 space-y-8">
+            {dbProgramme?.featured_image && (
+              <div className="aspect-21/9 w-full rounded-[14px] bg-slate-100 overflow-hidden border border-slate-200 shadow-sm">
+                <img
+                  src={dbProgramme.featured_image}
+                  alt={programmeTitle}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
             <div className="space-y-4">
               <h2 className="text-2xl font-bold text-[#0092DF]">Programme Overview</h2>
               <p className="text-[#64748B] leading-relaxed text-base">
-                {programme.label} is a strategic pillar within {siteConfig.name}, dedicated to designing scalable interventions alongside grassroots communities.
+                {programmeDesc}
               </p>
             </div>
 

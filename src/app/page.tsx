@@ -35,8 +35,19 @@ export default function HomePage() {
           supabase.from('team_members').select('*').eq('is_active', true).order('order_index', { ascending: true }).limit(4),
         ]);
 
-        if (resProg.data) setProgrammes(resProg.data as Programme[]);
-        if (resProj.data) setProjects(resProj.data as Project[]);
+        if (resProg.data && resProg.data.length > 0) {
+          setProgrammes(resProg.data as Programme[]);
+        } else if (typeof window !== 'undefined') {
+          const savedProg = localStorage.getItem('ecaph_programmes');
+          if (savedProg) try { setProgrammes(JSON.parse(savedProg)); } catch {}
+        }
+
+        if (resProj.data && resProj.data.length > 0) {
+          setProjects(resProj.data as Project[]);
+        } else if (typeof window !== 'undefined') {
+          const savedProj = localStorage.getItem('ecaph_projects');
+          if (savedProj) try { setProjects(JSON.parse(savedProj)); } catch {}
+        }
         if (resStat.data) setStats(resStat.data as ImpactStatistic[]);
         if (resPost.data) setPosts(resPost.data as Post[]);
         if (resTeam.data) setTeamMembers(resTeam.data as TeamMember[]);
@@ -193,17 +204,30 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {flagshipInitiatives.map((initiative) => (
-              <InitiativeCard
-                key={initiative.id}
-                id={initiative.id}
-                title={initiative.title}
-                category={initiative.category}
-                description={initiative.description}
-                location={initiative.location}
-                isFeatured={initiative.isFeatured}
-              />
-            ))}
+            {projects.length > 0
+              ? projects.slice(0, 4).map((p) => (
+                  <InitiativeCard
+                    key={p.id}
+                    id={p.id}
+                    title={p.title}
+                    category={p.category || 'Initiative'}
+                    description={p.summary}
+                    location={p.location || 'Northern Nigeria'}
+                    featured_image={p.featured_image}
+                    isFeatured={p.is_flagship}
+                  />
+                ))
+              : flagshipInitiatives.map((initiative) => (
+                  <InitiativeCard
+                    key={initiative.id}
+                    id={initiative.id}
+                    title={initiative.title}
+                    category={initiative.category}
+                    description={initiative.description}
+                    location={initiative.location}
+                    isFeatured={initiative.isFeatured}
+                  />
+                ))}
           </div>
         </div>
       </section>
