@@ -210,6 +210,20 @@ if (fs.existsSync(mediaDir)) {
       }
     }
   }
+
+  // Create legacy font aliases requested by previous CSS hashes
+  const legacyFonts = [
+    { target: 'a343f882a40d2cc9-s.1sj6eobyi31rd.woff2', source: 'a343f882a40d2cc9-s.0p-wng2nn8o-p.woff2' },
+    { target: 'a343f882a40d2cc9-s.p.1sj6eobyi31rd.woff2', source: 'a343f882a40d2cc9-s.p.0p-wng2nn8o-p.woff2' },
+  ];
+  for (const { target, source } of legacyFonts) {
+    const srcPath = path.join(mediaDir, source);
+    const dstPath = path.join(mediaDir, target);
+    if (fs.existsSync(srcPath) && !fs.existsSync(dstPath)) {
+      fs.copyFileSync(srcPath, dstPath);
+      console.log(`Created legacy font: ${target} <- ${source}`);
+    }
+  }
 }
 
 // 2. Create flat alias files for Next.js App Router RSC prefetch queries

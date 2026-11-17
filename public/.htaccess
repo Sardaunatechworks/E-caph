@@ -23,9 +23,10 @@
 <IfModule mod_headers.c>
   # Never cache HTML, Next.js RSC data files, or chunk fallbacks (ensures browsers always fetch fresh references)
   <FilesMatch "(\.(html|htm|txt)|fallback\.(js|css))$">
-    Header set Cache-Control "no-cache, no-store, must-revalidate"
+    Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
     Header set Pragma "no-cache"
     Header set Expires 0
+    Header set X-LiteSpeed-Cache-Control "no-cache"
   </FilesMatch>
 
   # Cache immutable hashed assets for high performance
@@ -50,11 +51,13 @@ RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# 7. Font compatibility alias (safely remaps .p. woff2 to non-.p. or vice versa if file is missing)
+# 7. Safe font compatibility alias (only rewrites if the alternate file actually exists on disk, preventing 500 loop)
 RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{DOCUMENT_ROOT}/_next/static/media/$1-s.$2 -f
 RewriteRule ^_next/static/media/(.+)-s\.p\.(.+\.woff2)$ _next/static/media/$1-s.$2 [L]
 
 RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{DOCUMENT_ROOT}/_next/static/media/$1-s.p.$2 -f
 RewriteRule ^_next/static/media/(.+)-s\.(.+\.woff2)$ _next/static/media/$1-s.p.$2 [L]
 
 # 8. Chunk compatibility fallback (prevents 404 & ChunkLoadError for any missing chunk from older builds)
