@@ -21,17 +21,28 @@
 
 # 3. Cache-Control Headers (Ensures instant updates after deployment)
 <IfModule mod_headers.c>
-  # Never cache HTML, Next.js RSC data files, or chunk fallbacks (ensures browsers always fetch fresh references)
-  <FilesMatch "(\.(html|htm|txt)|fallback\.(js|css))$">
+  # Default: NEVER cache HTML, directory routes, clean URLs, or RSC prefetch data
+  Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
+  Header set Pragma "no-cache"
+  Header set Expires 0
+  Header set X-LiteSpeed-Cache-Control "no-cache"
+
+  # Cache immutable static assets (media, fonts)
+  <FilesMatch "\.(woff2|woff|ttf|png|jpg|jpeg|gif|svg|webp|ico)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Cache static Next.js JS/CSS chunks, but NEVER fallbacks
+  <FilesMatch "^(?!fallback).*\.(js|css)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # Explicitly ensure fallbacks are never cached
+  <FilesMatch "fallback\.(js|css)$">
     Header set Cache-Control "no-cache, no-store, must-revalidate, max-age=0"
     Header set Pragma "no-cache"
     Header set Expires 0
     Header set X-LiteSpeed-Cache-Control "no-cache"
-  </FilesMatch>
-
-  # Cache immutable hashed assets for high performance
-  <FilesMatch "\.(js|css|woff2|woff|ttf|png|jpg|jpeg|gif|svg|webp|ico)$">
-    Header set Cache-Control "public, max-age=31536000, immutable"
   </FilesMatch>
 </IfModule>
 
