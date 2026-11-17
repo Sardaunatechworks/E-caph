@@ -21,8 +21,8 @@
 
 # 2b. Cache-Control Headers (Ensures instant updates after deployment)
 <IfModule mod_headers.c>
-  # Never cache HTML files (ensures browsers always fetch fresh chunk references)
-  <FilesMatch "\.(html|htm)$">
+  # Never cache HTML or Next.js RSC data files (ensures browsers always fetch fresh chunk references)
+  <FilesMatch "\.(html|htm|txt)$">
     Header set Cache-Control "no-cache, no-store, must-revalidate"
     Header set Pragma "no-cache"
     Header set Expires 0

@@ -143,17 +143,40 @@ if (fs.existsSync('public/.htaccess')) {
 // 1b. Write chunk fallbacks to prevent 404s and ChunkLoadErrors for any client with cached references
 const chunksDir = path.join('out', '_next', 'static', 'chunks');
 if (fs.existsSync(chunksDir)) {
-  const universalFallbackJs = '(function(){try{var c=(typeof document!=="undefined"&&document.currentScript)?document.currentScript:null;(globalThis.TURBOPACK=globalThis.TURBOPACK||[]).push([c,{}]);}catch(e){}try{(globalThis.__turbopack_load__=globalThis.__turbopack_load__||[]).push(["fallback",{64893:function(e){if(e&&e.s)e.s({});}}]);}catch(e){}})();';
+  const universalFallbackJs = '(function(){try{var c=(typeof document!=="undefined"&&document.currentScript)?document.currentScript:void 0;(globalThis.TURBOPACK=globalThis.TURBOPACK||[]).push([c,{otherChunks:[],runtimeModuleIds:[]}]);}catch(e){}if(typeof window!=="undefined"&&!window.__ecaph_reloading){window.__ecaph_reloading=true;try{var last=sessionStorage.getItem("ecaph_last_chunk_reload");if(!last||Date.now()-parseInt(last,10)>10000){sessionStorage.setItem("ecaph_last_chunk_reload",Date.now().toString());setTimeout(function(){window.location.reload();},150);}}catch(e){setTimeout(function(){window.location.reload();},150);}}})();';
   const universalFallbackCss = '/* fallback */';
 
   fs.writeFileSync(path.join(chunksDir, 'fallback.js'), universalFallbackJs);
   fs.writeFileSync(path.join(chunksDir, 'fallback.css'), universalFallbackCss);
 
   // Specific legacy hashes reported by active browser sessions
-  fs.writeFileSync(path.join(chunksDir, '1gc-b9suqwef4.js'), universalFallbackJs);
-  fs.writeFileSync(path.join(chunksDir, '0nxnqtqj_w2ru.css'), universalFallbackCss);
-  fs.writeFileSync(path.join(chunksDir, '2puv0rx1z5p61.js'), universalFallbackJs);
-  fs.writeFileSync(path.join(chunksDir, '2lt03smjhj35o.css'), universalFallbackCss);
+  const legacyHashes = [
+    '1gc-b9suqwef4.js',
+    '0nxnqtqj_w2ru.css',
+    '2puv0rx1z5p61.js',
+    '2lt03smjhj35o.css',
+    '0mwzin5rtg_ve.js',
+    '3ujr4ylr4fw_z.js',
+    '1gfwqrvk23fyv.js',
+    '2-i7he7zvu1p2.js',
+    '046o66dffag7m.js',
+    '0ip1aw1je79-6.js',
+    '0rymji_l4zs-n.js',
+    '1-63xo4oz9e4_.js',
+    '27ssxk6p2lffp.js',
+    '313-52rx7rt7t.css',
+    '35_o6r2_vx95k.js',
+    '3_8uwtshmxudb.js',
+    '3hzp7-to8fond.js',
+    '3p3as8yyfi_of.js',
+    '281q4ugqwd_2v.js',
+    '2iw1_85ojmx78.js'
+  ];
+
+  for (const file of legacyHashes) {
+    const isCss = file.endsWith('.css');
+    fs.writeFileSync(path.join(chunksDir, file), isCss ? universalFallbackCss : universalFallbackJs);
+  }
 }
 
 // 1c. Create dual font aliases (.p. and non-.p.) to prevent font 404s for any cached browser preloads
